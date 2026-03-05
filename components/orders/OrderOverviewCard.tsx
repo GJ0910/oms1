@@ -7,7 +7,7 @@ interface OrderOverviewCardProps {
   shopifyId: string;
   orderType: string;
   orderStatus: 'placed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  refundStatus: 'none' | 'pending' | 'completed' | 'failed';
+  refundStatus: 'NA' | 'none' | 'pending' | 'completed' | 'failed';
   paymentMethod: string;
 }
 
@@ -29,6 +29,7 @@ export function OrderOverviewCard({
   } as const;
 
   const refundStatusMap = {
+    NA: 'default',
     none: 'default',
     pending: 'warning',
     completed: 'success',
@@ -87,6 +88,8 @@ export function OrderOverviewCard({
             <StatusBadge status={refundStatusMap[refundStatus]}>
               {refundStatus === 'none'
                 ? 'No Refund'
+                : refundStatus === 'NA'
+                ? 'NA'
                 : refundStatus.charAt(0).toUpperCase() + refundStatus.slice(1)}
             </StatusBadge>
           </div>

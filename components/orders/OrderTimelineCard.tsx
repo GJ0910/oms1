@@ -1,11 +1,11 @@
 import { Timeline } from '@/components/shared/Timeline';
-import { Package, Truck, CheckCircle2, XCircle } from 'lucide-react';
+import { Package, Truck, CheckCircle2, XCircle, AlertCircle, Clock } from 'lucide-react';
 
 interface TimelineEvent {
   id: string;
-  title: string;
+  eventName: string;
   timestamp: string;
-  description?: string;
+  remarks?: string;
 }
 
 interface OrderTimelineCardProps {
@@ -15,17 +15,21 @@ interface OrderTimelineCardProps {
 export function OrderTimelineCard({ events }: OrderTimelineCardProps) {
   const iconMap: Record<string, any> = {
     placed: Package,
-    shipped: Truck,
+    confirmed: CheckCircle2,
+    'pickup-scheduled': Clock,
+    'pickup-done': Truck,
+    'in-transit': Truck,
+    'delivery-failed': AlertCircle,
     delivered: CheckCircle2,
     cancelled: XCircle,
   };
 
   const items = events.map(event => ({
     id: event.id,
-    title: event.title,
-    description: event.description,
+    title: event.eventName,
+    remarks: event.remarks,
     timestamp: event.timestamp,
-    icon: iconMap[event.id.split('-')[0]] || undefined,
+    icon: iconMap[event.id] || undefined,
   }));
 
   return (

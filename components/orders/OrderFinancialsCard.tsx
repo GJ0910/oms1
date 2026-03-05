@@ -13,6 +13,7 @@ interface Product {
 interface OrderFinancialsCardProps {
   awb: string;
   courierPartner: string;
+  couponCodeUsed?: string;
   invoiceSummaryINR: number;
   products: Product[];
 }
@@ -28,6 +29,7 @@ const formatINR = (amount: number) => {
 export function OrderFinancialsCard({
   awb,
   courierPartner,
+  couponCodeUsed,
   invoiceSummaryINR,
   products,
 }: OrderFinancialsCardProps) {
@@ -79,6 +81,14 @@ export function OrderFinancialsCard({
           <div className="field-label">Courier Partner</div>
           <div className="field-value">{courierPartner}</div>
         </div>
+
+        {/* Coupon Code Used */}
+        {couponCodeUsed && (
+          <div>
+            <div className="field-label">Coupon Code Used</div>
+            <div className="field-value font-mono">{couponCodeUsed}</div>
+          </div>
+        )}
 
         {/* Invoice Summary */}
         <div>

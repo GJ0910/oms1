@@ -5,6 +5,7 @@ interface TimelineItem {
   title: string;
   description?: string;
   timestamp: string;
+  remarks?: string;
   icon?: LucideIcon;
 }
 
@@ -34,11 +35,17 @@ export function Timeline({ items, className = '' }: TimelineProps) {
 
             {/* Content */}
             <div className="timeline-content">
-              <div className="flex items-start justify-between">
-                <h4 className="text-sm font-medium text-foreground">{item.title}</h4>
-                <span className="timeline-time">{item.timestamp}</span>
-              </div>
-              {item.description && (
+              {/* Event title */}
+              <h4 className="text-sm font-medium text-foreground">{item.title}</h4>
+              
+              {/* Timestamp */}
+              <p className="timeline-time mt-0.5">{item.timestamp}</p>
+              
+              {/* Remarks or description */}
+              {item.remarks && (
+                <p className="timeline-description text-xs mt-1">{item.remarks}</p>
+              )}
+              {item.description && !item.remarks && (
                 <p className="timeline-description">{item.description}</p>
               )}
             </div>

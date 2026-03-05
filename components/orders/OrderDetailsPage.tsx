@@ -16,89 +16,103 @@ interface OrderDetailsPageProps {
   orderId: string;
 }
 
-// Mock data for demo
+// Mock data for demo - DELIVERED ORDER SCENARIO
 const mockOrderData = {
   brand: 'Fitty',
   orderId: '#FT1230251-001',
   shopifyId: '#SH9876543210',
-  orderType: 'Standard',
+  orderType: 'Shopify',
   orderStatus: 'delivered' as const,
-  refundStatus: 'none' as const,
-  paymentMethod: 'Credit Card (Visa)',
+  refundStatus: 'NA' as const,
+  paymentMethod: 'Prepaid',
 
   // Customer
-  customerName: 'Raj Kumar',
-  customerEmail: 'rajkumar1990@example.com',
+  customerName: 'John Doe',
+  customerEmail: 'john.doe@example.com',
   customerPhone: '9876543210',
 
   // Logistics & Financials
-  awb: 'AWB123456789',
+  awb: 'AWB1234567890',
   courierPartner: 'DHL Express',
-  invoiceSummaryINR: 2485.50,
+  couponCodeUsed: 'FITTY20',
+  invoiceSummaryINR: 2000.00,
   products: [
     {
       id: 'prod-1',
-      name: 'Fitty Pro Fitness Plan',
-      quantity: 1,
-      priceINR: 2500.0,
-      discountINR: 14.5,
-      finalPriceINR: 2485.5,
+      name: 'Product A',
+      quantity: 2,
+      priceINR: 1200.00,
+      discountINR: 100.00,
+      finalPriceINR: 1100.00,
     },
     {
       id: 'prod-2',
-      name: 'Fitty Premium Coaching',
-      quantity: 0,
-      priceINR: 0,
-      discountINR: 0,
-      finalPriceINR: 0,
+      name: 'Product B',
+      quantity: 1,
+      priceINR: 1200.00,
+      discountINR: 100.00,
+      finalPriceINR: 900.00,
     },
   ],
 
   // Shipping
-  address: '123 Main Street, Apartment 4B',
-  city: 'Bangalore',
-  state: 'Karnataka',
+  address: '123 Main Street, Apt 4B',
+  city: 'Gurgaon',
+  state: 'Haryana',
   country: 'India',
-  pincode: '560001',
+  pincode: '122001',
 
-  // Clone
-  hasClone: true,
-  cloneOrderId: '#FT1230251-002',
-  cloneStatus: 'processing' as const,
-  cloneReason: 'Customer requested plan upgrade',
+  // Clone - NOT PRESENT for delivered orders
+  hasClone: false,
 
   // Delivery & Payment
-  deliveryDate: '2024-03-02',
-  deliveryTime: '2:30 PM',
+  deliveryDate: 'April 15, 2023',
+  deliveryTime: '2:00 PM',
   paymentStatus: 'completed' as const,
-  paymentDateTime: '2024-02-28 10:15 AM',
+  paymentDateTime: 'April 9, 2023; 10:00 AM',
 
-  // Timeline events
+  // Timeline events - DELIVERED ORDER FORMAT
   timelineEvents: [
     {
-      id: 'placed-1',
-      title: 'Order Placed',
-      timestamp: '2024-02-26 9:30 AM',
-      description: 'Customer placed order through website',
+      id: 'placed',
+      eventName: 'Order Placed',
+      timestamp: '26th February, 2026; 09:11 AM',
+      remarks: 'Remarks: Order Placed on Shopify',
     },
     {
-      id: 'shipped-1',
-      title: 'Order Shipped',
-      timestamp: '2024-02-28 11:00 AM',
-      description: 'Package picked up by DHL Express',
+      id: 'confirmed',
+      eventName: 'Order Confirmed',
+      timestamp: '26th February, 2026; 10:11 AM',
+      remarks: 'Remarks: Order Confirmed on EasyEcom',
     },
     {
-      id: 'delivered-1',
-      title: 'Order Delivered',
-      timestamp: '2024-03-02 2:30 PM',
-      description: 'Delivered to customer address',
+      id: 'pickup-scheduled',
+      eventName: 'Pickup Scheduled',
+      timestamp: '26th February, 2026; 11:11 AM',
+      remarks: 'Remarks: Courier - Shiprocket',
+    },
+    {
+      id: 'pickup-done',
+      eventName: 'Pickup Done',
+      timestamp: '26th February, 2026; 11:11 AM',
+      remarks: 'Remarks: AWB -',
+    },
+    {
+      id: 'in-transit',
+      eventName: 'In Transit',
+      timestamp: '26th February, 2026; 11:11 AM',
+      remarks: 'Remarks: NA',
+    },
+    {
+      id: 'delivered',
+      eventName: 'Delivered',
+      timestamp: '26th February, 2026; 11:11 AM',
+      remarks: 'Remarks: NA',
     },
   ],
 
-  // Refund (only shown if applicable)
-  showRefund: true,
-  refundUTR: 'UTR20240305001',
-  refundProcessedDateTime: '2024-03-05 3:45 PM',
+  // Refund - NO REFUND FOR DELIVERED ORDERS
+  showRefund: false,
 
   // Logs
   logs: [
@@ -175,6 +189,7 @@ export function OrderDetailsPage({ orderId }: OrderDetailsPageProps) {
       <OrderFinancialsCard
         awb={mockOrderData.awb}
         courierPartner={mockOrderData.courierPartner}
+        couponCodeUsed={mockOrderData.couponCodeUsed}
         invoiceSummaryINR={mockOrderData.invoiceSummaryINR}
         products={mockOrderData.products}
       />
@@ -207,13 +222,8 @@ export function OrderDetailsPage({ orderId }: OrderDetailsPageProps) {
       {/* Order Timeline */}
       <OrderTimelineCard events={mockOrderData.timelineEvents} />
 
-      {/* Refund Details - Conditional */}
-      {mockOrderData.showRefund && (
-        <RefundDetailsCard
-          refundUTR={mockOrderData.refundUTR}
-          refundProcessedDateTime={mockOrderData.refundProcessedDateTime}
-        />
-      )}
+      {/* Refund Details - Always show but content changes based on status */}
+      <RefundDetailsCard hasRefund={mockOrderData.showRefund} />
 
       {/* Logs & Remarks */}
       <LogsRemarksCard logs={logs} onAddRemark={handleAddRemark} />
