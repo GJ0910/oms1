@@ -1,15 +1,30 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { OrderDetailsPage } from '@/components/orders/OrderDetailsPage';
 import { Button } from '@/components/ui/button';
-import { Edit, Copy, Plus } from 'lucide-react';
+import { Edit, Plus } from 'lucide-react';
 
-export default function Home() {
+interface OrderPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export async function generateMetadata({ params }: OrderPageProps) {
+  const { id } = await params;
+  return {
+    title: `Order ${id} - Fitty Admin`,
+  };
+}
+
+export default async function OrderPage({ params }: OrderPageProps) {
+  const { id } = await params;
+
   return (
     <AppLayout
       headerTitle="Order Details"
       breadcrumbs={[
         { label: 'Orders', href: '/orders/search' },
-        { label: '#FT1230251-001' },
+        { label: id },
       ]}
       actions={
         <div className="flex items-center gap-2">
@@ -27,7 +42,7 @@ export default function Home() {
         </div>
       }
     >
-      <OrderDetailsPage orderId="#FT1230251-001" />
+      <OrderDetailsPage orderId={id} />
     </AppLayout>
   );
 }
