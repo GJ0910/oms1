@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X, Package, Search, Plus, BarChart3, LineChart, ListOrdered } from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
+
 import { PERMISSIONS } from '@/lib/types';
 
 export function Sidebar() {
@@ -14,7 +14,7 @@ export function Sidebar() {
     analytics: false,
   });
   const pathname = usePathname();
-  const { user } = useAuth();
+
 
   const toggleGroup = (group: string) => {
     setExpandedGroups(prev => ({
@@ -26,7 +26,7 @@ export function Sidebar() {
   const isActive = (href: string) => pathname.startsWith(href);
 
   // Build navigation based on user role
-  const userPermissions = user ? PERMISSIONS[user.role] : [];
+  29  const userPermissions = PERMISSIONS['Admin'] || [];
 
   const allNavItems = [
     {
@@ -78,9 +78,8 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 z-40 lg:sticky lg:z-0 lg:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 z-40 lg:sticky lg:z-0 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Header */}
         <div className="border-b border-sidebar-border px-6 py-6">
@@ -94,20 +93,18 @@ export function Sidebar() {
             <div key={group}>
               <button
                 onClick={() => toggleGroup(group)}
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                  expandedGroups[group]
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${expandedGroups[group]
                     ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                     : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon className="h-4 w-4" />
                   <span>{label}</span>
                 </div>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    expandedGroups[group] ? 'rotate-180' : ''
-                  }`}
+                  className={`h-4 w-4 transition-transform ${expandedGroups[group] ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -118,11 +115,10 @@ export function Sidebar() {
                     <Link
                       key={href}
                       href={href}
-                      className={`flex items-center gap-3 px-4 py-2 rounded-md text-sm transition-colors pl-6 ${
-                        isActive(href)
+                      className={`flex items-center gap-3 px-4 py-2 rounded-md text-sm transition-colors pl-6 ${isActive(href)
                           ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium'
                           : 'text-sidebar-foreground hover:bg-sidebar-accent/30'
-                      }`}
+                        }`}
                     >
                       <ItemIcon className="h-4 w-4" />
                       <span>{itemLabel}</span>
