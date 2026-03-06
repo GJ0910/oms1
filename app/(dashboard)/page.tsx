@@ -1,8 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PERMISSIONS } from '@/lib/types';
 import { Search, Plus, BarChart3, ListOrdered, ArrowRight } from 'lucide-react';
@@ -44,14 +42,7 @@ const SHORTCUT_CARDS = [
 ];
 
 export default function HomePage() {
-  const { user, isAuthenticated } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, router]);
+  const { user } = useAuth();
 
   if (!user) {
     return null;

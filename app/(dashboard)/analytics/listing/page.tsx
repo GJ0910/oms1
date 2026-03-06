@@ -1,22 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { OrderListingPage } from '@/components/orders/OrderListingPage';
 
 export default function AnalyticsListingPage() {
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, router]);
-
-  if (!isAuthenticated) {
+  if (!user) {
     return null;
   }
 
