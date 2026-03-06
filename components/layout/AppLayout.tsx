@@ -5,12 +5,11 @@ import { TopHeader } from './TopHeader';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  headerTitle?: string;
+  headerTitle: string;
   breadcrumbs?: Array<{ label: string; href?: string }>;
-  actions?: React.ReactNode;
 }
 
-export function AppLayout({ children, headerTitle, breadcrumbs, actions }: AppLayoutProps) {
+export function AppLayout({ children, headerTitle, breadcrumbs }: AppLayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar - hidden on mobile, shown on lg+ */}
@@ -25,10 +24,8 @@ export function AppLayout({ children, headerTitle, breadcrumbs, actions }: AppLa
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-auto w-full">
-        {/* Top header - only show if title is provided */}
-        {headerTitle && (
-          <TopHeader title={headerTitle} breadcrumbs={breadcrumbs} actions={actions} />
-        )}
+        {/* Top header - always show */}
+        <TopHeader title={headerTitle} breadcrumbs={breadcrumbs} />
 
         {/* Page content */}
         <main className="flex-1 overflow-auto">

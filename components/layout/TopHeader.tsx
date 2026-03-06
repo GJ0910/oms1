@@ -2,6 +2,7 @@
 
 import { ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
+import { UserSection } from './UserSection';
 
 interface BreadcrumbItem {
   label: string;
@@ -11,10 +12,9 @@ interface BreadcrumbItem {
 interface TopHeaderProps {
   title: string;
   breadcrumbs?: BreadcrumbItem[];
-  actions?: React.ReactNode;
 }
 
-export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) {
+export function TopHeader({ title, breadcrumbs = [] }: TopHeaderProps) {
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-card">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 lg:px-8 py-4 gap-4 sm:gap-0">
@@ -45,12 +45,10 @@ export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) 
           <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">{title}</h1>
         </div>
 
-        {/* Right side - Actions */}
-        {actions && (
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:ml-4 justify-end sm:justify-start">
-            {actions}
-          </div>
-        )}
+        {/* Right side - User Section */}
+        <div className="flex items-center justify-end sm:ml-4">
+          <UserSection />
+        </div>
       </div>
     </header>
   );

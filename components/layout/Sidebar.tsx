@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X, Package, Search, Plus, BarChart3, LineChart, ListOrdered } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
+import { PERMISSIONS } from '@/lib/types';
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
@@ -12,6 +14,7 @@ export function Sidebar() {
     analytics: false,
   });
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const toggleGroup = (group: string) => {
     setExpandedGroups(prev => ({
@@ -22,14 +25,17 @@ export function Sidebar() {
 
   const isActive = (href: string) => pathname.startsWith(href);
 
-  const navItems = [
+  // Build navigation based on user role
+  const userPermissions = user ? PERMISSIONS[user.role] : [];
+
+  const allNavItems = [
     {
       group: 'orders',
       label: 'Orders',
       icon: Package,
       items: [
-        { label: 'Search Orders', href: '/orders/search', icon: Search },
-        { label: 'Create Order', href: '/orders/create', icon: Plus },
+        { label: 'Search Orders', href: '/orders/search', icon: Search, permission: 'SearchOrders' },
+        { label: 'Create Order', href: '/orders/create', icon: Plus, permission: 'CreateOrder' },
       ],
     },
     {
@@ -37,11 +43,19 @@ export function Sidebar() {
       label: 'Analytics',
       icon: BarChart3,
       items: [
-        { label: 'Order Analytics', href: '/analytics/orders', icon: LineChart },
-        { label: 'Order Listing', href: '/analytics/listing', icon: ListOrdered },
+        { label: 'Order Analytics', href: '/analytics/orders', icon: LineChart, permission: 'OrderAnalytics' },
+        { label: 'Order Listing', href: '/analytics/listing', icon: ListOrdered, permission: 'OrderListing' },
       ],
     },
   ];
+
+  // Filter navigation items based on permissions
+  const navItems = allNavItems
+    .map(group => ({
+      ...group,
+      items: group.items.filter(item => userPermissions.includes(item.permission)),
+    }))
+    .filter(group => group.items.length > 0);
 
   return (
     <>
