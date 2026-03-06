@@ -23,46 +23,57 @@ interface OrderData {
   cloneOrderStatus?: string;
 }
 
-// Mock data - 100 orders for demo
-const generateMockOrders = (): OrderData[] => {
+// Static mock data - 100 orders for demo
+const MOCK_ORDERS: OrderData[] = [
+  { id: '#FT000001-001', timestamp: 'March 03, 2026; 12:36', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2301', paymentMethod: 'COD', orderStatus: 'delivered', awb: '123456789012', courier: 'DHL Express', refundStatus: 'NA' },
+  { id: '#FT000002-001', timestamp: 'March 02, 2026; 12:36', brand: 'Fitelo', orderType: 'Clone (System)', orderTotal: 3499.6, shopifyId: 'FY-2302', paymentMethod: 'Prepaid', orderStatus: 'placed', awb: '123456789013', courier: 'Shiprocket', refundStatus: 'NA', cloneOrderId: '#FTL-000002-001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' },
+  { id: '#FT000003-001', timestamp: 'March 01, 2026; 12:36', brand: 'Fitelo', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2303', paymentMethod: 'Prepaid', orderStatus: 'processing', awb: '123456789014', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-000003-001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' },
+  { id: '#FT000004-001', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2304', paymentMethod: 'Prepaid', orderStatus: 'cancelled', awb: '123456789015', courier: 'FedEx', refundStatus: 'Requested' },
+  { id: '#FT000005-001', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2305', paymentMethod: 'Partial COD', orderStatus: 'confirmed', awb: 'NA', courier: 'DHL Express', refundStatus: 'NA' },
+  { id: '#FT000006-001', timestamp: 'February 27, 2026; 08:15', brand: 'Fitelo', orderType: 'Clone (Manual)', orderTotal: 3499.6, shopifyId: 'FY-2306', paymentMethod: 'COD', orderStatus: 'delivered', awb: '123456789016', courier: 'Shiprocket', refundStatus: 'NA' },
+  { id: '#FT000007-001', timestamp: 'February 26, 2026; 14:22', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2307', paymentMethod: 'Prepaid', orderStatus: 'shipped', awb: '123456789017', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-000007-001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' },
+  { id: '#FT000008-001', timestamp: 'February 25, 2026; 10:45', brand: 'Fitelo', orderType: 'Medusa', orderTotal: 3499.6, shopifyId: 'FY-2308', paymentMethod: 'COD', orderStatus: 'placed', awb: '123456789018', courier: 'FedEx', refundStatus: 'NA' },
+  { id: '#FT000009-001', timestamp: 'February 24, 2026; 16:30', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2309', paymentMethod: 'Partial COD', orderStatus: 'processing', awb: '123456789019', courier: 'DHL Express', refundStatus: 'Requested' },
+  { id: '#FT000010-001', timestamp: 'February 23, 2026; 09:18', brand: 'Fitelo', orderType: 'Clone (System)', orderTotal: 3499.6, shopifyId: 'FY-2310', paymentMethod: 'Prepaid', orderStatus: 'delivered', awb: '123456789020', courier: 'Shiprocket', refundStatus: 'NA' },
+];
+
+// Generate remaining 90 orders with static pattern
+const generateRemainingOrders = (): OrderData[] => {
+  const orders = [...MOCK_ORDERS];
+  const statuses: Array<'delivered' | 'placed' | 'processing' | 'shipped' | 'cancelled' | 'confirmed'> = [
+    'delivered', 'placed', 'processing', 'shipped', 'cancelled', 'confirmed'
+  ];
   const brands = ['Fitty', 'Fitelo'];
   const orderTypes = ['Shopify', 'Clone (System)', 'Clone (Manual)', 'Medusa'];
   const paymentMethods = ['COD', 'Prepaid', 'Partial COD'];
-  const statuses: Array<'delivered' | 'placed' | 'processing' | 'shipped' | 'cancelled' | 'confirmed'> = [
-    'delivered',
-    'placed',
-    'processing',
-    'shipped',
-    'cancelled',
-    'confirmed',
-  ];
   const couriers = ['DHL Express', 'Shiprocket', 'BlueDart', 'FedEx'];
 
-  const orders: OrderData[] = [];
-  for (let i = 1; i <= 100; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-    const time = `${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
+  for (let i = 11; i <= 100; i++) {
+    const dayOffset = Math.floor((i - 1) / 3);
+    const statusIndex = (i - 1) % statuses.length;
+    const brandIndex = (i - 1) % brands.length;
+    const typeIndex = (i - 1) % orderTypes.length;
+    const paymentIndex = (i - 1) % paymentMethods.length;
+    const courierIndex = (i - 1) % couriers.length;
+
+    const date = new Date('2026-03-03');
+    date.setDate(date.getDate() - dayOffset);
+    const hours = String((i % 24)).padStart(2, '0');
+    const minutes = String((i * 7) % 60).padStart(2, '0');
 
     orders.push({
       id: `#FT${String(i).padStart(6, '0')}-001`,
-      timestamp: `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}, ${time}`,
-      brand: brands[Math.floor(Math.random() * brands.length)],
-      orderType: orderTypes[Math.floor(Math.random() * orderTypes.length)],
+      timestamp: `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}, ${hours}:${minutes}`,
+      brand: brands[brandIndex],
+      orderType: orderTypes[typeIndex],
       orderTotal: 3499.6,
       shopifyId: `FY-${String(2300 + i).padStart(4, '0')}`,
-      paymentMethod: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
-      orderStatus: statuses[Math.floor(Math.random() * statuses.length)],
-      awb: String(123456789000 + i).substring(0, 12),
-      courier: couriers[Math.floor(Math.random() * couriers.length)],
-      refundStatus: Math.random() > 0.7 ? 'Requested' : 'NA',
-      cloneOrderId:
-        Math.random() > 0.6 ? `#FTL-${String(i).padStart(6, '0')}-001` : undefined,
-      cloneReason:
-        Math.random() > 0.6
-          ? 'Reason: Pincode Change'
-          : undefined,
-      cloneOrderStatus: Math.random() > 0.6 ? 'Placed' : undefined,
+      paymentMethod: paymentMethods[paymentIndex],
+      orderStatus: statuses[statusIndex],
+      awb: statusIndex !== 4 ? String(123456789000 + i).substring(0, 12) : 'NA',
+      courier: couriers[courierIndex],
+      refundStatus: statusIndex === 3 || statusIndex === 4 ? 'Requested' : 'NA',
+      ...(typeIndex > 0 && { cloneOrderId: `#FTL-${String(i).padStart(6, '0')}-001`, cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' }),
     });
   }
   return orders;
@@ -78,7 +89,9 @@ export function OrderListingPage() {
   });
 
   const PAGE_SIZE = 10;
-  const allOrders = useMemo(() => generateMockOrders(), []);
+
+  // Use static mock orders combined with generated ones
+  const allOrders = useMemo(() => generateRemainingOrders(), []);
 
   // Filter orders based on search
   const filteredOrders = useMemo(() => {
