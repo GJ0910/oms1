@@ -1,21 +1,26 @@
+'use client';
+
+import { useRouter, useParams } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
+import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { OrderDetailsPage } from '@/components/orders/OrderDetailsPage';
 
-interface OrderPageProps {
-  params: Promise<{
-    id: string;
-  }>;
-}
+export default function OrderPage() {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
 
-export async function generateMetadata({ params }: OrderPageProps) {
-  const { id } = await params;
-  return {
-    title: `Order ${id} - Fitty Admin`,
-  };
-}
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
-export default async function OrderPage({ params }: OrderPageProps) {
-  const { id } = await params;
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <AppLayout

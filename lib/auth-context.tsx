@@ -9,8 +9,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount (client-side only)
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const storedUser = localStorage.getItem('auth_user');
     if (storedUser) {
       try {
