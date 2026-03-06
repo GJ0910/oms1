@@ -14,14 +14,8 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login, isAuthenticated } = useAuth();
 
-  // Redirect authenticated users to home
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/');
-    }
-  }, [isAuthenticated, router]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +28,24 @@ function LoginForm() {
       return;
     }
 
-    if (login(email, password)) {
+    const users = [
+      { email: 'admin@fitelo.co', password: 'Admin@123', role: 'Admin' },
+      { email: 'ops@fitelo.co', password: 'Ops@123', role: 'Ops' },
+      { email: 'cs@fitelo.co', password: 'Cs@123', role: 'CS' },
+    ];
+
+    const matchedUser = users.find(
+      (user) => user.email === email && user.password === password
+    );
+
+    if (matchedUser) {
+      localStorage.setItem(
+        'demo_user',
+        JSON.stringify({
+          email: matchedUser.email,
+          role: matchedUser.role,
+        })
+      );
       router.push('/');
     } else {
       setError('Invalid email or password');
