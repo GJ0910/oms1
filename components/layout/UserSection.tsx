@@ -2,22 +2,23 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
+
 import { ChevronDown, LogOut, User } from 'lucide-react';
 
 export function UserSection() {
-  const { user, logout } = useAuth();
+
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!user) {
-    return null;
-  }
+  const user = {
+    email: 'admin@fitelo.co',
+    role: 'Admin',
+  };
 
   const initials = user.email.split('@')[0].slice(0, 2).toUpperCase();
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('demo_user');
     setIsOpen(false);
     router.push('/login');
   };
