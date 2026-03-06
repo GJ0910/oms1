@@ -140,17 +140,6 @@ export function OrderListingPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Order Listing</h1>
-        </div>
-        <div className="text-right text-sm">
-          <div className="text-muted-foreground">Email:</div>
-          <div className="text-foreground font-medium">Role:</div>
-        </div>
-      </div>
-
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center bg-card rounded-lg p-4 border border-border">
         {/* Export Button */}
