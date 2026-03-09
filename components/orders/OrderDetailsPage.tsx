@@ -16,13 +16,15 @@ interface OrderDetailsPageProps {
   orderId: string;
 }
 
+import { ORDER_TYPES, ORDER_STATUSES } from '@/lib/types';
+
 // Mock data for demo - DELIVERED ORDER SCENARIO
 const mockOrderData = {
   brand: 'Fitty',
-  orderId: '#FT1230251-001',
+  orderId: '#FTY-090324-0001',
   shopifyId: '#SH9876543210',
-  orderType: 'Shopify',
-  orderStatus: 'delivered' as const,
+  orderType: ORDER_TYPES.SHOPIFY,
+  orderStatus: ORDER_STATUSES.DELIVERED,
   refundStatus: 'NA' as const,
   paymentMethod: 'Prepaid',
 
@@ -75,37 +77,37 @@ const mockOrderData = {
   timelineEvents: [
     {
       id: 'placed',
-      eventName: 'Order Placed',
+      eventName: ORDER_STATUSES.PLACED,
       timestamp: '26th February, 2026; 09:11 AM',
       remarks: 'Remarks: Order Placed on Shopify',
     },
     {
       id: 'confirmed',
-      eventName: 'Order Confirmed',
+      eventName: ORDER_STATUSES.CONFIRMED,
       timestamp: '26th February, 2026; 10:11 AM',
       remarks: 'Remarks: Order Confirmed on EasyEcom',
     },
     {
       id: 'pickup-scheduled',
-      eventName: 'Pickup Scheduled',
+      eventName: ORDER_STATUSES.PICKUP_SCHEDULED,
       timestamp: '26th February, 2026; 11:11 AM',
       remarks: 'Remarks: Courier - Shiprocket',
     },
     {
       id: 'pickup-done',
-      eventName: 'Pickup Done',
+      eventName: ORDER_STATUSES.PICKUP_DONE,
       timestamp: '26th February, 2026; 11:11 AM',
       remarks: 'Remarks: AWB -',
     },
     {
       id: 'in-transit',
-      eventName: 'In Transit',
+      eventName: ORDER_STATUSES.IN_TRANSIT,
       timestamp: '26th February, 2026; 11:11 AM',
       remarks: 'Remarks: NA',
     },
     {
       id: 'delivered',
-      eventName: 'Delivered',
+      eventName: ORDER_STATUSES.DELIVERED,
       timestamp: '26th February, 2026; 11:11 AM',
       remarks: 'Remarks: NA',
     },

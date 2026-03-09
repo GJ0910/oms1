@@ -6,15 +6,18 @@ import { Search, ChevronDown, Calendar, Download, ChevronLeft, ChevronRight } fr
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CopyButton } from '@/components/shared/CopyButton';
 
+import { ORDER_TYPES, ORDER_STATUSES, shouldHaveAWB, canHaveClone, generateOrderId } from '@/lib/types';
+import type { OrderType, OrderStatus } from '@/lib/types';
+
 interface OrderData {
   id: string;
   timestamp: string;
   brand: string;
-  orderType: string;
+  orderType: OrderType;
   orderTotal: number;
   shopifyId: string;
   paymentMethod: string;
-  orderStatus: 'delivered' | 'placed' | 'processing' | 'shipped' | 'cancelled' | 'confirmed';
+  orderStatus: OrderStatus;
   awb: string;
   courier: string;
   refundStatus: string;
@@ -25,34 +28,32 @@ interface OrderData {
 
 // Static mock data - 100 orders for demo
 const MOCK_ORDERS: OrderData[] = [
-  { id: '#FT000001-001', timestamp: 'March 03, 2026; 12:36', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2301', paymentMethod: 'COD', orderStatus: 'delivered', awb: '123456789012', courier: 'DHL Express', refundStatus: 'NA' },
-  { id: '#FT000002-001', timestamp: 'March 02, 2026; 12:36', brand: 'Fitelo', orderType: 'Clone (System)', orderTotal: 3499.6, shopifyId: 'FY-2302', paymentMethod: 'Prepaid', orderStatus: 'placed', awb: '123456789013', courier: 'Shiprocket', refundStatus: 'NA', cloneOrderId: '#FTL-000002-001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' },
-  { id: '#FT000003-001', timestamp: 'March 01, 2026; 12:36', brand: 'Fitelo', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2303', paymentMethod: 'Prepaid', orderStatus: 'processing', awb: '123456789014', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-000003-001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' },
-  { id: '#FT000004-001', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2304', paymentMethod: 'Prepaid', orderStatus: 'cancelled', awb: '123456789015', courier: 'FedEx', refundStatus: 'Requested' },
-  { id: '#FT000005-001', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2305', paymentMethod: 'Partial COD', orderStatus: 'confirmed', awb: 'NA', courier: 'DHL Express', refundStatus: 'NA' },
-  { id: '#FT000006-001', timestamp: 'February 27, 2026; 08:15', brand: 'Fitelo', orderType: 'Clone (Manual)', orderTotal: 3499.6, shopifyId: 'FY-2306', paymentMethod: 'COD', orderStatus: 'delivered', awb: '123456789016', courier: 'Shiprocket', refundStatus: 'NA' },
-  { id: '#FT000007-001', timestamp: 'February 26, 2026; 14:22', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2307', paymentMethod: 'Prepaid', orderStatus: 'shipped', awb: '123456789017', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-000007-001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' },
-  { id: '#FT000008-001', timestamp: 'February 25, 2026; 10:45', brand: 'Fitelo', orderType: 'Medusa', orderTotal: 3499.6, shopifyId: 'FY-2308', paymentMethod: 'COD', orderStatus: 'placed', awb: '123456789018', courier: 'FedEx', refundStatus: 'NA' },
-  { id: '#FT000009-001', timestamp: 'February 24, 2026; 16:30', brand: 'Fitty', orderType: 'Shopify', orderTotal: 3499.6, shopifyId: 'FY-2309', paymentMethod: 'Partial COD', orderStatus: 'processing', awb: '123456789019', courier: 'DHL Express', refundStatus: 'Requested' },
-  { id: '#FT000010-001', timestamp: 'February 23, 2026; 09:18', brand: 'Fitelo', orderType: 'Clone (System)', orderTotal: 3499.6, shopifyId: 'FY-2310', paymentMethod: 'Prepaid', orderStatus: 'delivered', awb: '123456789020', courier: 'Shiprocket', refundStatus: 'NA' },
+  { id: '#FTY-030326-0001', timestamp: 'March 03, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2301', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789012', courier: 'DHL Express', refundStatus: 'NA' },
+  { id: '#FTL-020326-0001', timestamp: 'March 02, 2026; 12:36', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_SYSTEM, orderTotal: 3499.6, shopifyId: 'FY-2302', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.PLACED, awb: 'NA', courier: 'Shiprocket', refundStatus: 'NA' },
+  { id: '#FTL-010326-0001', timestamp: 'March 01, 2026; 12:36', brand: 'Fitelo', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2303', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.PICKUP_DONE, awb: '123456789014', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-010326-0002', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: ORDER_STATUSES.PLACED },
+  { id: '#FTY-280226-0001', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2304', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.CANCELLED, awb: 'NA', courier: 'FedEx', refundStatus: 'Requested' },
+  { id: '#FTY-280226-0002', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2305', paymentMethod: 'Partial COD', orderStatus: ORDER_STATUSES.CONFIRMED, awb: 'NA', courier: 'DHL Express', refundStatus: 'NA' },
+  { id: '#FTL-270226-0001', timestamp: 'February 27, 2026; 08:15', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_MANUAL, orderTotal: 3499.6, shopifyId: 'FY-2306', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789016', courier: 'Shiprocket', refundStatus: 'NA' },
+  { id: '#FTY-260226-0001', timestamp: 'February 26, 2026; 14:22', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2307', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.IN_TRANSIT, awb: '123456789017', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-260226-0001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: ORDER_STATUSES.PLACED },
+  { id: '#FTL-250226-0001', timestamp: 'February 25, 2026; 10:45', brand: 'Fitelo', orderType: ORDER_TYPES.MEDUSA, orderTotal: 3499.6, shopifyId: 'FY-2308', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.PLACED, awb: 'NA', courier: 'FedEx', refundStatus: 'NA' },
+  { id: '#FTY-240226-0001', timestamp: 'February 24, 2026; 16:30', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2309', paymentMethod: 'Partial COD', orderStatus: ORDER_STATUSES.OUT_FOR_DELIVERY, awb: '123456789019', courier: 'DHL Express', refundStatus: 'NA' },
+  { id: '#FTL-230226-0001', timestamp: 'February 23, 2026; 09:18', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_SYSTEM, orderTotal: 3499.6, shopifyId: 'FY-2310', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789020', courier: 'Shiprocket', refundStatus: 'NA' },
 ];
 
-// Generate remaining 90 orders with static pattern
+// Generate remaining 90 orders with static pattern following business rules
 const generateRemainingOrders = (): OrderData[] => {
   const orders = [...MOCK_ORDERS];
-  const statuses: Array<'delivered' | 'placed' | 'processing' | 'shipped' | 'cancelled' | 'confirmed'> = [
-    'delivered', 'placed', 'processing', 'shipped', 'cancelled', 'confirmed'
-  ];
-  const brands = ['Fitty', 'Fitelo'];
-  const orderTypes = ['Shopify', 'Clone (System)', 'Clone (Manual)', 'Medusa'];
+  const statusValues = Object.values(ORDER_STATUSES);
+  const brandValues = ['Fitty', 'Fitelo'] as const;
+  const orderTypeValues = Object.values(ORDER_TYPES);
   const paymentMethods = ['COD', 'Prepaid', 'Partial COD'];
   const couriers = ['DHL Express', 'Shiprocket', 'BlueDart', 'FedEx'];
 
   for (let i = 11; i <= 100; i++) {
     const dayOffset = Math.floor((i - 1) / 3);
-    const statusIndex = (i - 1) % statuses.length;
-    const brandIndex = (i - 1) % brands.length;
-    const typeIndex = (i - 1) % orderTypes.length;
+    const statusIndex = (i - 1) % statusValues.length;
+    const brandIndex = (i - 1) % brandValues.length;
+    const typeIndex = (i - 1) % orderTypeValues.length;
     const paymentIndex = (i - 1) % paymentMethods.length;
     const courierIndex = (i - 1) % couriers.length;
 
@@ -60,21 +61,33 @@ const generateRemainingOrders = (): OrderData[] => {
     date.setDate(date.getDate() - dayOffset);
     const hours = String((i % 24)).padStart(2, '0');
     const minutes = String((i * 7) % 60).padStart(2, '0');
+    
+    const brand = brandValues[brandIndex];
+    const orderType = orderTypeValues[typeIndex] as OrderType;
+    const status = statusValues[statusIndex] as OrderStatus;
 
-    orders.push({
-      id: `#FT${String(i).padStart(6, '0')}-001`,
+    const order: OrderData = {
+      id: generateOrderId(brand, date, i),
       timestamp: `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}, ${hours}:${minutes}`,
-      brand: brands[brandIndex],
-      orderType: orderTypes[typeIndex],
+      brand,
+      orderType,
       orderTotal: 3499.6,
       shopifyId: `FY-${String(2300 + i).padStart(4, '0')}`,
       paymentMethod: paymentMethods[paymentIndex],
-      orderStatus: statuses[statusIndex],
-      awb: statusIndex !== 4 ? String(123456789000 + i).substring(0, 12) : 'NA',
+      orderStatus: status,
+      awb: shouldHaveAWB(status) ? String(123456789000 + i).substring(0, 12) : 'NA',
       courier: couriers[courierIndex],
-      refundStatus: statusIndex === 3 || statusIndex === 4 ? 'Requested' : 'NA',
-      ...(typeIndex > 0 && { cloneOrderId: `#FTL-${String(i).padStart(6, '0')}-001`, cloneReason: 'Reason: Pincode Change', cloneOrderStatus: 'Placed' }),
-    });
+      refundStatus: [ORDER_STATUSES.CANCELLED, ORDER_STATUSES.DELIVERY_FAILED].includes(status) ? 'Requested' : 'NA',
+    };
+
+    // Only original orders can have clones (not clone orders themselves)
+    if (canHaveClone(orderType) && typeIndex === 0) {
+      order.cloneOrderId = generateOrderId(brand, date, i + 1000);
+      order.cloneReason = 'Reason: Pincode Change';
+      order.cloneOrderStatus = ORDER_STATUSES.PLACED;
+    }
+
+    orders.push(order);
   }
   return orders;
 };
