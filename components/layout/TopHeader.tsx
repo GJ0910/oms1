@@ -1,7 +1,8 @@
 'use client';
 
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home, ChevronDown, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 interface BreadcrumbItem {
   label: string;
@@ -15,6 +16,10 @@ interface TopHeaderProps {
 }
 
 export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const userEmail = 'admin@fitelo.co';
+  const userRole = 'Admin';
+
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-card">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 lg:px-8 py-4 gap-4 sm:gap-0">
@@ -45,12 +50,50 @@ export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) 
           <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">{title}</h1>
         </div>
 
-        {/* Right side - Actions */}
-        {actions && (
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:ml-4 justify-end sm:justify-start">
-            {actions}
+        {/* Right side - User section and Actions */}
+        <div className="flex items-center gap-4 sm:ml-4">
+          {/* User Info */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
+            >
+              {/* Avatar */}
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-semibold text-primary">A</span>
+              </div>
+              
+              {/* User details - hidden on mobile */}
+              <div className="hidden sm:flex flex-col items-start">
+                <span className="text-xs text-muted-foreground">{userEmail}</span>
+                <span className="text-xs font-medium text-foreground">{userRole}</span>
+              </div>
+
+              <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
+                <button className="w-full px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Edit Profile
+                </button>
+                <button className="w-full px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors flex items-center gap-2 border-t border-border">
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Actions */}
+          {actions && (
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              {actions}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

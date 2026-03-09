@@ -23,24 +23,10 @@ export default async function OrderPage({ params }: OrderPageProps) {
     <AppLayout
       headerTitle="Order Details"
       breadcrumbs={[
+        { label: 'Home', href: '/' },
         { label: 'Orders', href: '/orders/search' },
         { label: id },
       ]}
-      actions={
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Edit className="h-4 w-4" />
-            Edit Order
-          </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create Clone
-          </Button>
-          <Button variant="destructive" size="sm">
-            Cancel Order
-          </Button>
-        </div>
-      }
     >
       <OrderDetailsPage orderId={id} />
     </AppLayout>
