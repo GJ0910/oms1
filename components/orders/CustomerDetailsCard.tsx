@@ -1,5 +1,3 @@
-import { MaskedField } from '@/components/shared/MaskedField';
-
 interface CustomerDetailsCardProps {
   name: string;
   email: string;
@@ -19,10 +17,16 @@ export function CustomerDetailsCard({ name, email, phone }: CustomerDetailsCardP
         </div>
 
         {/* Email */}
-        <MaskedField value={email} type="email" label="Email" />
+        <div>
+          <div className="field-label">Email</div>
+          <div className="field-value">{email}</div>
+        </div>
 
         {/* Phone */}
-        <MaskedField value={phone} type="phone" label="Phone" />
+        <div>
+          <div className="field-label">Phone</div>
+          <div className="field-value">{phone}</div>
+        </div>
       </div>
     </div>
   );
