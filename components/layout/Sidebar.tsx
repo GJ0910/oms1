@@ -63,16 +63,17 @@ export function Sidebar() {
       )}
 
       {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 z-40 lg:sticky lg:z-0 lg:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        {/* Header */}
-        <div className="border-b border-sidebar-border px-6 py-6">
-          <h1 className="text-xl font-bold text-sidebar-foreground">Fitty</h1>
-          <p className="text-xs text-sidebar-accent-foreground mt-1">Orders Admin</p>
-        </div>
+      <aside className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-200 fixed lg:static inset-y-0 left-0 z-40 w-64 bg-card border-r border-border overflow-y-auto`}>
+        <div className="p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-8">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-bold text-primary-foreground">NGF</span>
+            </div>
+            <div>
+              <h1 className="font-semibold text-foreground">No Guilt</h1>
+              <p className="text-xs text-muted-foreground">Order Management</p>
+            </div>
+          </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">

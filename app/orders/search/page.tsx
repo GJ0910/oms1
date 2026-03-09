@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Search, ChevronDown, Calendar, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CopyButton } from '@/components/shared/CopyButton';
@@ -41,31 +42,32 @@ const MOCK_ORDERS: OrderData[] = [
 ];
 
 export default function SearchOrdersPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get('q') || '';
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
 
-  const filteredOrders = useMemo(() => {
-    if (!searchQuery.trim()) return [];
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [queryParam]);
 
-    const query = searchQuery.toLowerCase();
+  const filteredOrders = useMemo(() => {
+    if (!queryParam.trim()) return [];
+
+    const query = queryParam.toLowerCase();
     return MOCK_ORDERS.filter(order =>
       order.id.toLowerCase().includes(query) ||
       order.shopifyId.toLowerCase().includes(query) ||
       order.awb.toLowerCase().includes(query) ||
       order.brand.toLowerCase().includes(query)
     );
-  }, [searchQuery]);
+  }, [queryParam]);
 
   const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE);
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
-
-  const handleSearch = () => {
-    setCurrentPage(1);
-  };
 
   const formatINR = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -81,37 +83,12 @@ export default function SearchOrdersPage() {
       breadcrumbs={[{ label: 'Orders', href: '/orders/search' }]}
     >
       <div className="space-y-6">
-        {/* Search controls */}
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search for an order ID, customer, or AWB"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <button
-                onClick={handleSearch}
-                className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors gap-2"
-              >
-                <Search className="h-4 w-4" />
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Results or empty state */}
-        {searchQuery.trim() === '' ? (
+        {queryParam.trim() === '' ? (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium text-foreground mb-2">Search for orders</p>
-            <p className="text-sm text-muted-foreground">Enter an order ID, customer name, or AWB to find orders</p>
+            <p className="text-sm text-muted-foreground">Use the search box in the top bar to find orders by ID, Shopify ID, AWB, phone, or email</p>
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="text-center py-12">

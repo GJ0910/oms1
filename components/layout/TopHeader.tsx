@@ -1,7 +1,8 @@
 'use client';
 
-import { ChevronRight, Home, ChevronDown, LogOut, User } from 'lucide-react';
+import { ChevronRight, Home, ChevronDown, LogOut, User, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface BreadcrumbItem {
@@ -17,8 +18,18 @@ interface TopHeaderProps {
 
 export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const router = useRouter();
   const userEmail = 'admin@fitelo.co';
   const userRole = 'Admin';
+
+  const handleGlobalSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (globalSearchQuery.trim()) {
+      router.push(`/orders/search?q=${encodeURIComponent(globalSearchQuery)}`);
+      setGlobalSearchQuery('');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-card">
@@ -49,6 +60,26 @@ export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) 
           ) : null}
           <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">{title}</h1>
         </div>
+
+        {/* Center - Global Search */}
+        <form onSubmit={handleGlobalSearch} className="flex-1 max-w-md mx-auto px-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search orders by ID, Shopify ID, AWB, phone, email..."
+              value={globalSearchQuery}
+              onChange={(e) => setGlobalSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 pr-10 text-sm rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            />
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Search"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
 
         {/* Right side - User section and Actions */}
         <div className="flex items-center gap-4 sm:ml-4">

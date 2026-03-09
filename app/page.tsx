@@ -39,7 +39,7 @@ export default function Home() {
       <div className="space-y-8">
         {/* Welcome section */}
         <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to Fitty Orders</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Welcome back, Admin</h2>
           <p className="text-muted-foreground">Access order management tools and analytics from the shortcuts below.</p>
         </div>
 
