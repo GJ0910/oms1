@@ -13,6 +13,9 @@ import {
   BarChart3,
   LineChart,
   ListOrdered,
+  ClipboardList,
+  FileText,
+  Files,
 } from 'lucide-react';
 import { getAuthUser, hasPermission, type AuthUser } from '@/lib/auth';
 
@@ -20,6 +23,7 @@ export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     orders: true,
+    requests: false,
     analytics: false,
   });
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -47,6 +51,15 @@ export function Sidebar() {
       items: [
         { label: 'Search Orders', href: '/orders/search', icon: Search, permissionId: 'search-orders' },
         { label: 'Create Order', href: '/orders/create', icon: Plus, permissionId: 'create-order' },
+      ],
+    },
+    {
+      group: 'requests',
+      label: 'Requests',
+      icon: ClipboardList,
+      items: [
+        { label: 'Open Requests', href: '/requests/open', icon: FileText, permissionId: 'open-requests' },
+        { label: 'All Requests', href: '/requests/all', icon: Files, permissionId: 'all-requests' },
       ],
     },
     {
