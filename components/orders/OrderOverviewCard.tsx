@@ -4,7 +4,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 interface OrderOverviewCardProps {
   brand: string;
   orderId: string;
-  shopifyId: string;
+  platformId: string;
   orderType: string;
   orderStatus: 'placed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   refundStatus: 'NA' | 'none' | 'pending' | 'completed' | 'failed';
@@ -14,7 +14,7 @@ interface OrderOverviewCardProps {
 export function OrderOverviewCard({
   brand,
   orderId,
-  shopifyId,
+  platformId,
   orderType,
   orderStatus,
   refundStatus,
@@ -72,18 +72,18 @@ export function OrderOverviewCard({
         {/* Order ID */}
         <div>
           <div className="field-label">Order ID</div>
-          <div className="flex items-center justify-between">
-            <div className="field-value font-mono">{orderId}</div>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="field-value font-mono m-0">{orderId}</div>
             <CopyButton text={orderId} label="Copy" />
           </div>
         </div>
 
-        {/* Shopify ID */}
+        {/* Platform ID */}
         <div>
-          <div className="field-label">Shopify ID</div>
-          <div className="flex items-center justify-between">
-            <div className="field-value font-mono">{shopifyId}</div>
-            <CopyButton text={shopifyId} label="Copy" />
+          <div className="field-label">Platform ID</div>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="field-value font-mono m-0">{platformId}</div>
+            <CopyButton text={platformId} label="Copy" />
           </div>
         </div>
 

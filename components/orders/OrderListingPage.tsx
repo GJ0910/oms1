@@ -9,13 +9,29 @@ import { CopyButton } from '@/components/shared/CopyButton';
 import { ORDER_TYPES, ORDER_STATUSES, shouldHaveAWB, canHaveClone, generateOrderId } from '@/lib/types';
 import type { OrderType, OrderStatus } from '@/lib/types';
 
+// RTO and cancellation statuses that should show red badge
+const RED_BADGE_STATUSES: OrderStatus[] = [
+  ORDER_STATUSES.RTO_NDR,
+  ORDER_STATUSES.RTO_IN_TRANSIT_NDR,
+  ORDER_STATUSES.RTO_DELIVERED_NDR,
+  ORDER_STATUSES.CANCELLATION_REQUESTED,
+  ORDER_STATUSES.CANCELLED,
+  ORDER_STATUSES.RTO_CANCELLATION,
+  ORDER_STATUSES.RTO_IN_TRANSIT_CANCELLATION,
+  ORDER_STATUSES.RTO_DELIVERED_CANCELLATION,
+  ORDER_STATUSES.CANCELLED_REPLACEMENT_CREATED,
+  ORDER_STATUSES.RTO_REPLACEMENT_CREATED,
+  ORDER_STATUSES.RTO_IN_TRANSIT_REPLACEMENT_CREATED,
+  ORDER_STATUSES.RTO_DELIVERED_REPLACEMENT_CREATED,
+];
+
 interface OrderData {
   id: string;
   timestamp: string;
   brand: string;
   orderType: OrderType;
   orderTotal: number;
-  shopifyId: string;
+  platformId: string;
   paymentMethod: string;
   orderStatus: OrderStatus;
   awb: string;
@@ -24,20 +40,24 @@ interface OrderData {
   cloneOrderId?: string;
   cloneReason?: string;
   cloneOrderStatus?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
 }
 
 // Static mock data - 100 orders for demo
 const MOCK_ORDERS: OrderData[] = [
-  { id: '#FTY-030326-0001', timestamp: 'March 03, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2301', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789012', courier: 'DHL Express', refundStatus: 'NA' },
-  { id: '#FTL-020326-0001', timestamp: 'March 02, 2026; 12:36', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_SYSTEM, orderTotal: 3499.6, shopifyId: 'FY-2302', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.PLACED, awb: 'NA', courier: 'Shiprocket', refundStatus: 'NA' },
-  { id: '#FTL-010326-0001', timestamp: 'March 01, 2026; 12:36', brand: 'Fitelo', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2303', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.PICKUP_DONE, awb: '123456789014', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-010326-0002', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: ORDER_STATUSES.PLACED },
-  { id: '#FTY-280226-0001', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2304', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.CANCELLED, awb: 'NA', courier: 'FedEx', refundStatus: 'Requested' },
-  { id: '#FTY-280226-0002', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2305', paymentMethod: 'Partial COD', orderStatus: ORDER_STATUSES.CONFIRMED, awb: 'NA', courier: 'DHL Express', refundStatus: 'NA' },
-  { id: '#FTL-270226-0001', timestamp: 'February 27, 2026; 08:15', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_MANUAL, orderTotal: 3499.6, shopifyId: 'FY-2306', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789016', courier: 'Shiprocket', refundStatus: 'NA' },
-  { id: '#FTY-260226-0001', timestamp: 'February 26, 2026; 14:22', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2307', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.IN_TRANSIT, awb: '123456789017', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-260226-0001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: ORDER_STATUSES.PLACED },
-  { id: '#FTL-250226-0001', timestamp: 'February 25, 2026; 10:45', brand: 'Fitelo', orderType: ORDER_TYPES.MEDUSA, orderTotal: 3499.6, shopifyId: 'FY-2308', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.PLACED, awb: 'NA', courier: 'FedEx', refundStatus: 'NA' },
-  { id: '#FTY-240226-0001', timestamp: 'February 24, 2026; 16:30', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, shopifyId: 'FY-2309', paymentMethod: 'Partial COD', orderStatus: ORDER_STATUSES.OUT_FOR_DELIVERY, awb: '123456789019', courier: 'DHL Express', refundStatus: 'NA' },
-  { id: '#FTL-230226-0001', timestamp: 'February 23, 2026; 09:18', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_SYSTEM, orderTotal: 3499.6, shopifyId: 'FY-2310', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789020', courier: 'Shiprocket', refundStatus: 'NA' },
+  { id: '#FTL-040326-0001', timestamp: 'March 04, 2026; 10:00', brand: 'Fitelo', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 4999.0, platformId: '#GARVIT00', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.PLACED, awb: 'NA', courier: 'Shiprocket', refundStatus: 'NA', customerName: 'Garvit', customerEmail: 'garvit.jaisinghani@fitelo.co', customerPhone: '9876500000' },
+  { id: '#FTY-030326-0001', timestamp: 'March 03, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, platformId: 'FY-2301', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789012', courier: 'DHL Express', refundStatus: 'NA', customerName: 'John Doe', customerEmail: 'john.doe@example.com', customerPhone: '9876543210' },
+  { id: '#FTL-020326-0001', timestamp: 'March 02, 2026; 12:36', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_SYSTEM, orderTotal: 3499.6, platformId: 'FY-2302', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.PLACED, awb: 'NA', courier: 'Shiprocket', refundStatus: 'NA', customerName: 'Jane Smith', customerEmail: 'jane.smith@example.com', customerPhone: '9876543211' },
+  { id: '#FTL-010326-0001', timestamp: 'March 01, 2026; 12:36', brand: 'Fitelo', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, platformId: 'FY-2303', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.PICKUP_DONE, awb: '123456789014', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-010326-0002', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: ORDER_STATUSES.PLACED, customerName: 'Raj Kumar', customerEmail: 'raj.kumar@example.com', customerPhone: '9876543212' },
+  { id: '#FTY-280226-0001', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, platformId: 'FY-2304', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.CANCELLED, awb: 'NA', courier: 'FedEx', refundStatus: 'Requested', customerName: 'Priya Sharma', customerEmail: 'priya.sharma@example.com', customerPhone: '9876543213' },
+  { id: '#FTY-280226-0002', timestamp: 'February 28, 2026; 12:36', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, platformId: 'FY-2305', paymentMethod: 'Partial COD', orderStatus: ORDER_STATUSES.CONFIRMED, awb: 'NA', courier: 'DHL Express', refundStatus: 'NA', customerName: 'Amit Patel', customerEmail: 'amit.patel@example.com', customerPhone: '9876543214' },
+  { id: '#FTL-270226-0001', timestamp: 'February 27, 2026; 08:15', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_MANUAL, orderTotal: 3499.6, platformId: 'FY-2306', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789016', courier: 'Shiprocket', refundStatus: 'NA', customerName: 'Neha Gupta', customerEmail: 'neha.gupta@example.com', customerPhone: '9876543215' },
+  { id: '#FTY-260226-0001', timestamp: 'February 26, 2026; 14:22', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, platformId: 'FY-2307', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.IN_TRANSIT, awb: '123456789017', courier: 'BlueDart', refundStatus: 'NA', cloneOrderId: '#FTL-260226-0001', cloneReason: 'Reason: Pincode Change', cloneOrderStatus: ORDER_STATUSES.PLACED, customerName: 'Rahul Singh', customerEmail: 'rahul.singh@example.com', customerPhone: '9876543216' },
+  { id: '#FTL-250226-0001', timestamp: 'February 25, 2026; 10:45', brand: 'Fitelo', orderType: ORDER_TYPES.MEDUSA, orderTotal: 3499.6, platformId: 'FY-2308', paymentMethod: 'COD', orderStatus: ORDER_STATUSES.PLACED, awb: 'NA', courier: 'FedEx', refundStatus: 'NA', customerName: 'Sneha Kapoor', customerEmail: 'sneha.kapoor@example.com', customerPhone: '9876543217' },
+  { id: '#FTY-240226-0001', timestamp: 'February 24, 2026; 16:30', brand: 'Fitty', orderType: ORDER_TYPES.SHOPIFY, orderTotal: 3499.6, platformId: 'FY-2309', paymentMethod: 'Partial COD', orderStatus: ORDER_STATUSES.OUT_FOR_DELIVERY, awb: '123456789019', courier: 'DHL Express', refundStatus: 'NA', customerName: 'Vikram Mehta', customerEmail: 'vikram.mehta@example.com', customerPhone: '9876543218' },
+  { id: '#FTL-230226-0001', timestamp: 'February 23, 2026; 09:18', brand: 'Fitelo', orderType: ORDER_TYPES.CLONE_SYSTEM, orderTotal: 3499.6, platformId: 'FY-2310', paymentMethod: 'Prepaid', orderStatus: ORDER_STATUSES.DELIVERED, awb: '123456789020', courier: 'Shiprocket', refundStatus: 'NA', customerName: 'Anita Joshi', customerEmail: 'anita.joshi@example.com', customerPhone: '9876543219' },
 ];
 
 // Generate remaining 90 orders with static pattern following business rules
@@ -72,7 +92,10 @@ const generateRemainingOrders = (): OrderData[] => {
       brand,
       orderType,
       orderTotal: 3499.6,
-      shopifyId: `FY-${String(2300 + i).padStart(4, '0')}`,
+      platformId: `FY-${String(2300 + i).padStart(4, '0')}`,
+      customerName: `Customer ${i}`,
+      customerEmail: `customer${i}@example.com`,
+      customerPhone: `98765${String(43000 + i).padStart(5, '0')}`,
       paymentMethod: paymentMethods[paymentIndex],
       orderStatus: status,
       awb: shouldHaveAWB(status) ? String(123456789000 + i).substring(0, 12) : 'NA',
@@ -108,10 +131,14 @@ export function OrderListingPage() {
 
   // Filter orders based on search
   const filteredOrders = useMemo(() => {
+    const query = searchQuery.toLowerCase();
     return allOrders.filter(order =>
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.shopifyId.toLowerCase().includes(searchQuery.toLowerCase())
+      order.id.toLowerCase().includes(query) ||
+      order.brand.toLowerCase().includes(query) ||
+      order.platformId.toLowerCase().includes(query) ||
+      order.awb.toLowerCase().includes(query) ||
+      (order.customerEmail?.toLowerCase().includes(query)) ||
+      (order.customerPhone?.includes(query))
     );
   }, [allOrders, searchQuery]);
 
@@ -135,16 +162,17 @@ export function OrderListingPage() {
     alert(`Export started for ${sortedOrders.length} orders`);
   };
 
-  const getStatusType = (status: string) => {
-    const statusMap: Record<string, 'success' | 'warning' | 'pending' | 'error' | 'default'> = {
-      delivered: 'success',
-      placed: 'warning',
-      processing: 'pending',
-      shipped: 'pending',
-      cancelled: 'error',
-      confirmed: 'warning',
-    };
-    return statusMap[status.toLowerCase()] || 'default';
+  const getStatusType = (status: OrderStatus): 'success' | 'warning' | 'pending' | 'error' | 'default' => {
+    if (RED_BADGE_STATUSES.includes(status)) {
+      return 'error';
+    }
+    if (status === ORDER_STATUSES.DELIVERED) {
+      return 'success';
+    }
+    if (status === ORDER_STATUSES.PLACED || status === ORDER_STATUSES.CONFIRMED) {
+      return 'warning';
+    }
+    return 'pending';
   };
 
   const formatINR = (value: number) => {
@@ -222,7 +250,7 @@ export function OrderListingPage() {
               <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Brand</th>
               <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order Type</th>
               <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order Total</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Shopify ID</th>
+              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Platform ID</th>
               <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Payment Method</th>
               <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order Status</th>
               <th className="px-4 py-3 text-left font-semibold text-muted-foreground">AWB</th>
@@ -259,8 +287,8 @@ export function OrderListingPage() {
                 {/* Order Total */}
                 <td className="px-4 py-3 text-foreground font-mono">{formatINR(order.orderTotal)}</td>
 
-                {/* Shopify ID */}
-                <td className="px-4 py-3 text-foreground">{order.shopifyId}</td>
+                {/* Platform ID */}
+                <td className="px-4 py-3 text-foreground">{order.platformId}</td>
 
                 {/* Payment Method */}
                 <td className="px-4 py-3 text-foreground">{order.paymentMethod}</td>
@@ -274,12 +302,12 @@ export function OrderListingPage() {
 
                 {/* AWB + Copy */}
                 <td className="px-4 py-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <div className="text-foreground font-mono">{order.awb}</div>
-                      <div className="text-xs text-muted-foreground">Courier: {order.courier}</div>
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-foreground font-mono">{order.awb}</span>
+                      {order.awb !== 'NA' && <CopyButton text={order.awb} label="" />}
                     </div>
-                    <CopyButton text={order.awb} label="" />
+                    <div className="text-xs text-muted-foreground">Courier: {order.courier}</div>
                   </div>
                 </td>
 

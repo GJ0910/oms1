@@ -22,7 +22,7 @@ import { ORDER_TYPES, ORDER_STATUSES } from '@/lib/types';
 const mockOrderData = {
   brand: 'Fitty',
   orderId: '#FTY-090324-0001',
-  shopifyId: '#SH9876543210',
+  platformId: '#SH9876543210',
   orderType: ORDER_TYPES.SHOPIFY,
   orderStatus: ORDER_STATUSES.DELIVERED,
   refundStatus: 'NA' as const,
@@ -173,7 +173,7 @@ export function OrderDetailsPage({ orderId }: OrderDetailsPageProps) {
       <OrderOverviewCard
         brand={mockOrderData.brand}
         orderId={mockOrderData.orderId}
-        shopifyId={mockOrderData.shopifyId}
+        platformId={mockOrderData.platformId}
         orderType={mockOrderData.orderType}
         orderStatus={mockOrderData.orderStatus}
         refundStatus={mockOrderData.refundStatus}

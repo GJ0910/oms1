@@ -62,24 +62,26 @@ export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) 
         </div>
 
         {/* Center - Global Search */}
-        <form onSubmit={handleGlobalSearch} className="flex-1 max-w-md mx-auto px-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search orders by ID, Shopify ID, AWB, phone, email..."
-              value={globalSearchQuery}
-              onChange={(e) => setGlobalSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 pr-10 text-sm rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-            />
-            <button
-              type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Search"
-            >
-              <Search className="h-4 w-4" />
-            </button>
-          </div>
-        </form>
+        <div className="flex-1 flex justify-center px-4">
+          <form onSubmit={handleGlobalSearch} className="w-full max-w-md">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search by Order ID, Platform ID, AWB, phone, email..."
+                value={globalSearchQuery}
+                onChange={(e) => setGlobalSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 pr-10 text-sm rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Search"
+              >
+                <Search className="h-4 w-4" />
+              </button>
+            </div>
+          </form>
+        </div>
 
         {/* Right side - User section and Actions */}
         <div className="flex items-center gap-4 sm:ml-4">

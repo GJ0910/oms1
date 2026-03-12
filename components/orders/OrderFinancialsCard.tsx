@@ -70,8 +70,8 @@ export function OrderFinancialsCard({
         {/* AWB */}
         <div>
           <div className="field-label">AWB</div>
-          <div className="flex items-center justify-between mt-1">
-            <div className="field-value font-mono">{awb}</div>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="field-value font-mono m-0">{awb}</div>
             <CopyButton text={awb} label="Copy" />
           </div>
         </div>
