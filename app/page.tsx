@@ -1,6 +1,12 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/AppLayout';
 import Link from 'next/link';
 import { Search, Plus, BarChart3, ListOrdered } from 'lucide-react';
+import { getAuthUser, hasPermission, type AuthUser } from '@/lib/auth';
+import { Spinner } from '@/components/ui/spinner';
 
 const SHORTCUT_CARDS = [
   {
@@ -34,18 +40,48 @@ const SHORTCUT_CARDS = [
 ];
 
 export default function Home() {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const authUser = getAuthUser();
+    if (!authUser) {
+      router.replace('/login');
+    } else {
+      setUser(authUser);
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Spinner className="h-8 w-8 text-primary" />
+      </div>
+    );
+  }
+
+  // Filter cards based on user role
+  const visibleCards = user
+    ? SHORTCUT_CARDS.filter((card) => hasPermission(user.role, card.id))
+    : [];
+
   return (
     <AppLayout headerTitle="Home">
       <div className="space-y-8">
         {/* Welcome section */}
         <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Welcome back, Admin</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">
+            Welcome {user?.name ?? 'User'}
+          </h2>
           <p className="text-muted-foreground">Access order management tools and analytics from the shortcuts below.</p>
         </div>
 
         {/* Shortcut cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {SHORTCUT_CARDS.map(card => {
+          {visibleCards.map(card => {
             const Icon = card.icon;
             return (
               <Link

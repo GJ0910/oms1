@@ -3,7 +3,8 @@
 import { ChevronRight, Home, ChevronDown, LogOut, User, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getAuthUser, clearAuthUser, getUserInitials, type AuthUser } from '@/lib/auth';
 
 interface BreadcrumbItem {
   label: string;
@@ -19,9 +20,22 @@ interface TopHeaderProps {
 export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [user, setUser] = useState<AuthUser | null>(null);
   const router = useRouter();
-  const userEmail = 'admin@fitelo.co';
-  const userRole = 'Admin';
+
+  useEffect(() => {
+    setUser(getAuthUser());
+  }, []);
+
+  const handleLogout = () => {
+    clearAuthUser();
+    setIsDropdownOpen(false);
+    router.push('/login');
+  };
+
+  const userEmail = user?.email ?? '';
+  const userRole = user?.role ?? '';
+  const userInitials = user ? getUserInitials(user.name) : 'U';
 
   const handleGlobalSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +107,7 @@ export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) 
             >
               {/* Avatar */}
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-semibold text-primary">A</span>
+                <span className="text-xs font-semibold text-primary">{userInitials}</span>
               </div>
               
               {/* User details - hidden on mobile */}
@@ -112,7 +126,10 @@ export function TopHeader({ title, breadcrumbs = [], actions }: TopHeaderProps) 
                   <User className="h-4 w-4" />
                   Edit Profile
                 </button>
-                <button className="w-full px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors flex items-center gap-2 border-t border-border">
+                <button 
+                  onClick={handleLogout}
+                  className="w-full px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors flex items-center gap-2 border-t border-border"
+                >
                   <LogOut className="h-4 w-4" />
                   Logout
                 </button>

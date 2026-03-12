@@ -9,6 +9,8 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CopyButton } from '@/components/shared/CopyButton';
 import { ORDER_TYPES, ORDER_STATUSES } from '@/lib/types';
 import type { OrderType, OrderStatus } from '@/lib/types';
+import { useAuthGuard } from '@/hooks/use-auth-guard';
+import { Spinner } from '@/components/ui/spinner';
 
 // RTO and cancellation statuses that should show red badge
 const RED_BADGE_STATUSES: OrderStatus[] = [
@@ -75,6 +77,7 @@ function getStatusBadgeType(status: OrderStatus): 'success' | 'warning' | 'pendi
 }
 
 export default function SearchOrdersPage() {
+  const { isLoading: isAuthLoading } = useAuthGuard();
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryParam = searchParams.get('q') || '';
@@ -83,6 +86,14 @@ export default function SearchOrdersPage() {
   const [activeSearch, setActiveSearch] = useState(queryParam);
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Spinner className="h-8 w-8 text-primary" />
+      </div>
+    );
+  }
 
   const handleLocalSearch = (e: FormEvent) => {
     e.preventDefault();

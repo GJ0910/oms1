@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -14,6 +14,7 @@ import {
   LineChart,
   ListOrdered,
 } from 'lucide-react';
+import { getAuthUser, hasPermission, type AuthUser } from '@/lib/auth';
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
@@ -21,8 +22,13 @@ export function Sidebar() {
     orders: true,
     analytics: false,
   });
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const pathname = usePathname();
+
+  useEffect(() => {
+    setUser(getAuthUser());
+  }, []);
 
   const toggleGroup = (group: string) => {
     setExpandedGroups((prev) => ({
@@ -33,14 +39,14 @@ export function Sidebar() {
 
   const isActive = (href: string) => pathname.startsWith(href);
 
-  const navItems = [
+  const allNavItems = [
     {
       group: 'orders',
       label: 'Orders',
       icon: Package,
       items: [
-        { label: 'Search Orders', href: '/orders/search', icon: Search },
-        { label: 'Create Order', href: '/orders/create', icon: Plus },
+        { label: 'Search Orders', href: '/orders/search', icon: Search, permissionId: 'search-orders' },
+        { label: 'Create Order', href: '/orders/create', icon: Plus, permissionId: 'create-order' },
       ],
     },
     {
@@ -48,11 +54,21 @@ export function Sidebar() {
       label: 'Analytics',
       icon: BarChart3,
       items: [
-        { label: 'Order Analytics', href: '/analytics/orders', icon: LineChart },
-        { label: 'Order Listing', href: '/analytics/listing', icon: ListOrdered },
+        { label: 'Order Analytics', href: '/analytics/orders', icon: LineChart, permissionId: 'order-analytics' },
+        { label: 'Order Listing', href: '/analytics/listing', icon: ListOrdered, permissionId: 'order-listing' },
       ],
     },
   ];
+
+  // Filter nav items based on user role
+  const navItems = user
+    ? allNavItems
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) => hasPermission(user.role, item.permissionId)),
+        }))
+        .filter((group) => group.items.length > 0)
+    : [];
 
   return (
     <>
