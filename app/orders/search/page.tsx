@@ -77,6 +77,7 @@ function getStatusBadgeType(status: OrderStatus): 'success' | 'warning' | 'pendi
 }
 
 export default function SearchOrdersPage() {
+  // ALL hooks must be at the top, before any conditional returns
   const { isLoading: isAuthLoading } = useAuthGuard();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -87,24 +88,7 @@ export default function SearchOrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
 
-  if (isAuthLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Spinner className="h-8 w-8 text-primary" />
-      </div>
-    );
-  }
-
-  const handleLocalSearch = (e: FormEvent) => {
-    e.preventDefault();
-    if (localSearchQuery.trim()) {
-      setActiveSearch(localSearchQuery.trim());
-      setCurrentPage(1);
-      // Update URL without navigation
-      router.replace(`/orders/search?q=${encodeURIComponent(localSearchQuery.trim())}`, { scroll: false });
-    }
-  };
-
+  // useMemo must be called unconditionally
   const filteredOrders = useMemo(() => {
     if (!activeSearch.trim()) return [];
 
@@ -118,6 +102,7 @@ export default function SearchOrdersPage() {
     );
   }, [activeSearch]);
 
+  // Derived values (not hooks, safe to compute after hooks)
   const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE);
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * PAGE_SIZE,
@@ -131,6 +116,25 @@ export default function SearchOrdersPage() {
       minimumFractionDigits: 2,
     }).format(amount);
   };
+
+  const handleLocalSearch = (e: FormEvent) => {
+    e.preventDefault();
+    if (localSearchQuery.trim()) {
+      setActiveSearch(localSearchQuery.trim());
+      setCurrentPage(1);
+      // Update URL without navigation
+      router.replace(`/orders/search?q=${encodeURIComponent(localSearchQuery.trim())}`, { scroll: false });
+    }
+  };
+
+  // Conditional returns AFTER all hooks
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Spinner className="h-8 w-8 text-primary" />
+      </div>
+    );
+  }
 
   return (
     <AppLayout
