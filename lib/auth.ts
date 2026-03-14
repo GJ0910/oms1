@@ -1,7 +1,7 @@
 // Simple localStorage-based mock auth
 // No AuthProvider, no useAuth, no complex architecture
 
-export type UserRole = 'Admin' | 'Ops' | 'CS';
+export type UserRole = 'Admin' | 'Ops' | 'CS' | 'Finance';
 
 export interface User {
   email: string;
@@ -21,20 +21,26 @@ const MOCK_USERS: User[] = [
   {
     email: 'admin@fitelo.co',
     password: 'Admin@123',
-    name: 'Admin User',
+    name: 'Admin',
     role: 'Admin',
   },
   {
     email: 'ops@fitelo.co',
     password: 'Ops@123',
-    name: 'Ops User',
+    name: 'Ops',
     role: 'Ops',
   },
   {
     email: 'cs@fitelo.co',
     password: 'Cs@123',
-    name: 'CS User',
+    name: 'CS',
     role: 'CS',
+  },
+  {
+    email: 'finance@fitelo.co',
+    password: 'Finance@123',
+    name: 'Finance',
+    role: 'Finance',
   },
 ];
 
@@ -43,6 +49,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   Admin: ['search-orders', 'create-order', 'order-analytics', 'order-listing', 'open-requests', 'all-requests'],
   Ops: ['search-orders', 'create-order', 'order-analytics', 'order-listing', 'open-requests', 'all-requests'],
   CS: ['search-orders', 'open-requests'],
+  Finance: ['search-orders', 'open-requests', 'all-requests'],
 };
 
 // Auth storage key
