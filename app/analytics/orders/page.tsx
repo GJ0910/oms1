@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { CalendarIcon, Package, CheckCircle2, DollarSign, CreditCard, Banknote, ShoppingBag, Database, Copy, Settings, Info } from 'lucide-react';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
