@@ -46,10 +46,10 @@ const MOCK_USERS: User[] = [
 
 // RBAC permissions
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  Admin: ['search-orders', 'create-order', 'order-analytics', 'order-listing', 'open-requests', 'all-requests'],
-  Ops: ['search-orders', 'create-order', 'order-analytics', 'order-listing', 'open-requests', 'all-requests'],
-  CS: ['search-orders', 'open-requests'],
-  Finance: ['search-orders', 'open-requests', 'all-requests'],
+  Admin: ['my-tasks', 'search-orders', 'create-order', 'order-analytics', 'order-listing', 'open-requests', 'all-requests'],
+  Ops: ['my-tasks', 'search-orders', 'create-order', 'order-analytics', 'order-listing', 'open-requests', 'all-requests'],
+  CS: ['my-tasks', 'search-orders', 'open-requests'],
+  Finance: ['my-tasks', 'search-orders', 'open-requests', 'all-requests'],
 };
 
 // Auth storage key

@@ -16,6 +16,7 @@ import {
   ClipboardList,
   FileText,
   Files,
+  CheckSquare,
 } from 'lucide-react';
 import { getAuthUser, hasPermission, type AuthUser } from '@/lib/auth';
 
@@ -42,6 +43,11 @@ export function Sidebar() {
   };
 
   const isActive = (href: string) => pathname.startsWith(href);
+
+  // Direct nav items (no dropdown)
+  const directNavItems = [
+    { label: 'My Tasks', href: '/tasks', icon: CheckSquare, permissionId: 'my-tasks' },
+  ];
 
   const allNavItems = [
     {
@@ -72,6 +78,11 @@ export function Sidebar() {
       ],
     },
   ];
+
+  // Filter direct nav items based on user role
+  const filteredDirectNavItems = user
+    ? directNavItems.filter((item) => hasPermission(user.role, item.permissionId))
+    : [];
 
   // Filter nav items based on user role
   const navItems = user
@@ -121,6 +132,23 @@ export function Sidebar() {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 overflow-y-auto">
+            {/* My Tasks - Direct navigation item (no dropdown) */}
+            {filteredDirectNavItems.map(({ label, href, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
+                  isActive(href)
+                    ? 'bg-sidebar-primary text-sidebar-primary-foreground'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{label}</span>
+              </Link>
+            ))}
+
+            {/* Groups with dropdowns */}
             {navItems.map(({ group, label, icon: Icon, items }) => (
               <div key={group}>
                 <button

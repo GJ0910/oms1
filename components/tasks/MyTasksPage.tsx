@@ -2,15 +2,7 @@
 
 import { useState, useMemo, useEffect, FormEvent } from 'react';
 import Link from 'next/link';
-import { Search, Calendar, Download, ChevronLeft, ChevronRight, MoreVertical, ChevronDown, ChevronUp, Eye, EyeOff, Copy, Check, X } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
+import { Search, Calendar, Download, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Eye, EyeOff, Copy, Check, X, MoreVertical } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import {
   REQUEST_TYPES,
@@ -22,6 +14,14 @@ import {
 } from '@/lib/types';
 import type { RequestType, RequestStatus, RefundStatus, ReattemptStatus, UpdateStatus } from '@/lib/types';
 import { getAuthUser, type UserRole } from '@/lib/auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
 
 // Remark entry type
 interface RemarkEntry {
@@ -44,7 +44,6 @@ interface RequestData {
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
-  // Refund-specific fields
   refundSourceAccount?: string;
   utrNumber?: string;
   refundedOn?: string;
@@ -57,19 +56,6 @@ function generateRequestIdNew(type: RequestType, orderId: string, requestCount: 
   const orderIdWithoutHash = orderId.replace('#', '');
   const countStr = String(requestCount).padStart(2, '0');
   return `#${typeCode}-${orderIdWithoutHash}-${countStr}`;
-}
-
-// Default assignment rules
-function getDefaultAssignment(type: RequestType): UserRole {
-  switch (type) {
-    case REQUEST_TYPES.REFUND:
-      return 'Admin';
-    case REQUEST_TYPES.REATTEMPT:
-    case REQUEST_TYPES.UPDATE:
-      return 'Ops';
-    default:
-      return 'Ops';
-  }
 }
 
 // Mock request data with remarks history and proper assignments
@@ -161,42 +147,6 @@ const MOCK_REQUESTS: RequestData[] = [
     customerPhone: '9876543216',
     refundSourceAccount: '9876543210987654',
   },
-  {
-    requestId: generateRequestIdNew(REQUEST_TYPES.REFUND, '#FTL-250226-0001', 1),
-    orderId: '#FTL-250226-0001',
-    platformId: 'FY-2308',
-    raisedTime: 'March 02, 2026; 16:45',
-    requestType: REQUEST_TYPES.REFUND,
-    raisedBy: 'Admin',
-    assignedTo: 'Finance',
-    status: REFUND_STATUSES.PROCESSED,
-    remarks: [
-      { text: 'Refund completed successfully', timestamp: 'March 02, 2026 17:00', userName: 'Finance', role: 'Finance' },
-    ],
-    customerName: 'Sneha Kapoor',
-    customerEmail: 'sneha.kapoor@example.com',
-    customerPhone: '9876543217',
-    refundSourceAccount: '5678901234567890',
-    utrNumber: 'UTR123456789',
-    refundedOn: 'March 02, 2026 17:00',
-    processedBy: 'Finance',
-  },
-  {
-    requestId: generateRequestIdNew(REQUEST_TYPES.REFUND, '#FTY-240226-0001', 1),
-    orderId: '#FTY-240226-0001',
-    platformId: 'FY-2309',
-    raisedTime: 'March 01, 2026; 11:20',
-    requestType: REQUEST_TYPES.REFUND,
-    raisedBy: 'CS',
-    assignedTo: 'Admin',
-    status: REFUND_STATUSES.DEFERRED,
-    remarks: [
-      { text: 'Refund deferred - customer ineligible', timestamp: 'March 01, 2026 12:00', userName: 'Admin', role: 'Admin' },
-    ],
-    customerName: 'Vikram Mehta',
-    customerEmail: 'vikram.mehta@example.com',
-    customerPhone: '9876543218',
-  },
   // Reattempt requests - assigned to Ops by default
   {
     requestId: generateRequestIdNew(REQUEST_TYPES.REATTEMPT, '#FTL-010326-0001', 1),
@@ -214,22 +164,6 @@ const MOCK_REQUESTS: RequestData[] = [
     customerEmail: 'raj.kumar@example.com',
     customerPhone: '9876543212',
   },
-  {
-    requestId: generateRequestIdNew(REQUEST_TYPES.REATTEMPT, '#FTY-280226-0002', 1),
-    orderId: '#FTY-280226-0002',
-    platformId: 'FY-2305',
-    raisedTime: 'March 04, 2026; 10:00',
-    requestType: REQUEST_TYPES.REATTEMPT,
-    raisedBy: 'Ops',
-    assignedTo: 'Ops',
-    status: REATTEMPT_STATUSES.INITIATED,
-    remarks: [
-      { text: 'Reattempt scheduled for March 06', timestamp: 'March 04, 2026 10:30', userName: 'Ops', role: 'Ops' },
-    ],
-    customerName: 'Amit Patel',
-    customerEmail: 'amit.patel@example.com',
-    customerPhone: '9876543214',
-  },
   // Update requests - assigned to Ops by default
   {
     requestId: generateRequestIdNew(REQUEST_TYPES.UPDATE, '#FTL-040326-0001', 1),
@@ -246,22 +180,6 @@ const MOCK_REQUESTS: RequestData[] = [
     customerName: 'Garvit',
     customerEmail: 'garvit.jaisinghani@fitelo.co',
     customerPhone: '9876500000',
-  },
-  {
-    requestId: generateRequestIdNew(REQUEST_TYPES.UPDATE, '#FTL-230226-0001', 1),
-    orderId: '#FTL-230226-0001',
-    platformId: 'FY-2310',
-    raisedTime: 'March 03, 2026; 14:30',
-    requestType: REQUEST_TYPES.UPDATE,
-    raisedBy: 'Admin',
-    assignedTo: 'Ops',
-    status: UPDATE_STATUSES.INITIATED,
-    remarks: [
-      { text: 'Address update sent to courier', timestamp: 'March 03, 2026 15:00', userName: 'Ops', role: 'Ops' },
-    ],
-    customerName: 'Anita Joshi',
-    customerEmail: 'anita.joshi@example.com',
-    customerPhone: '9876543219',
   },
 ];
 
@@ -287,7 +205,6 @@ const generateMoreRequests = (): RequestData[] => {
     let assignedTo: UserRole;
     if (requestType === REQUEST_TYPES.REFUND) {
       status = refundStatuses[(i - 1) % refundStatuses.length];
-      // Assign based on status for refunds
       if (status === REFUND_STATUSES.ACCEPTED || status === REFUND_STATUSES.PROCESSING_PENDING || status === REFUND_STATUSES.PROCESSED) {
         assignedTo = 'Finance';
       } else if (status === REFUND_STATUSES.REVIEW) {
@@ -327,7 +244,6 @@ const generateMoreRequests = (): RequestData[] => {
       customerPhone: `98765${String(43000 + i).padStart(5, '0')}`,
     };
 
-    // Add refund-specific fields for processed refunds
     if (requestType === REQUEST_TYPES.REFUND && status === REFUND_STATUSES.PROCESSED) {
       request.refundSourceAccount = `${String(1234567890 + i * 1000).slice(0, 16)}`;
       request.utrNumber = `UTR${String(100000 + i)}`;
@@ -416,11 +332,7 @@ function getActionsForRequest(
     }));
 }
 
-interface RequestListingPageProps {
-  showOnlyOpen?: boolean;
-}
-
-export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageProps) {
+export function MyTasksPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date');
   const [localSearchQuery, setLocalSearchQuery] = useState('');
@@ -461,13 +373,17 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
     setRequests(generateMoreRequests());
   }, []);
 
-  // Filter requests based on open/all and search
+  // Filter requests: only pending/open requests assigned to the current user
   const filteredRequests = useMemo(() => {
-    let filtered = requests;
-
-    if (showOnlyOpen) {
-      filtered = filtered.filter((request) => isRequestOpen(request.requestType, request.status));
-    }
+    if (!currentUser) return [];
+    
+    let filtered = requests.filter((request) => {
+      // Only show open requests
+      const isOpen = isRequestOpen(request.requestType, request.status);
+      // Only show requests assigned to current user
+      const isAssignedToMe = request.assignedTo === currentUser.role;
+      return isOpen && isAssignedToMe;
+    });
 
     if (activeSearch.trim()) {
       const query = activeSearch.toLowerCase();
@@ -482,7 +398,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
     }
 
     return filtered;
-  }, [requests, showOnlyOpen, activeSearch]);
+  }, [requests, currentUser, activeSearch]);
 
   // Sort requests
   const sortedRequests = useMemo(() => {
@@ -507,7 +423,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
   };
 
   const handleExport = () => {
-    alert(`Export started for ${sortedRequests.length} requests`);
+    alert(`Export started for ${sortedRequests.length} tasks`);
   };
 
   const getStatusType = (status: RequestStatus): 'success' | 'warning' | 'pending' | 'error' | 'default' => {
@@ -668,6 +584,13 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
 
   return (
     <div className="space-y-6">
+      {/* Info banner */}
+      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+        <p className="text-sm text-foreground">
+          Showing pending tasks assigned to you ({currentUser?.role}). Complete these tasks to move requests forward.
+        </p>
+      </div>
+
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center bg-card rounded-lg p-4 border border-border">
         <button
@@ -675,7 +598,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
           className="btn-primary flex items-center gap-2 whitespace-nowrap"
         >
           <Download className="h-4 w-4" />
-          Export {sortedRequests.length} Requests
+          Export {sortedRequests.length} Tasks
         </button>
 
         <form onSubmit={handleSearch} className="flex-1 relative min-w-0">
@@ -743,161 +666,167 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
             </tr>
           </thead>
           <tbody>
-            {paginatedRequests.map((request, index) => {
-              // Check if request is open to determine if actions should be shown
-              const requestIsOpen = isRequestOpen(request.requestType, request.status);
-              const actionsWithState = currentUser && requestIsOpen
-                ? getActionsForRequest(request.requestType, currentUser.role)
-                : [];
-              const latestRemark = request.remarks[request.remarks.length - 1];
-              const isExpanded = expandedRemarks.has(request.requestId);
-              const isAccountVisible = visibleAccounts.has(request.requestId);
-              const showRefundAccount = request.requestType === REQUEST_TYPES.REFUND && canViewRefundAccount;
+            {paginatedRequests.length === 0 ? (
+              <tr>
+                <td colSpan={canViewRefundAccount ? 11 : 10} className="px-4 py-12 text-center text-muted-foreground">
+                  No pending tasks assigned to you.
+                </td>
+              </tr>
+            ) : (
+              paginatedRequests.map((request, index) => {
+                const actionsWithState = currentUser
+                  ? getActionsForRequest(request.requestType, currentUser.role)
+                  : [];
+                const latestRemark = request.remarks[request.remarks.length - 1];
+                const isExpanded = expandedRemarks.has(request.requestId);
+                const isAccountVisible = visibleAccounts.has(request.requestId);
+                const showRefundAccount = request.requestType === REQUEST_TYPES.REFUND && canViewRefundAccount;
 
-              return (
-                <tr
-                  key={request.requestId}
-                  className={`border-b border-border last:border-b-0 ${
-                    index % 2 === 1 ? 'bg-muted/20' : ''
-                  } hover:bg-muted/30 transition-colors`}
-                >
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/orders/${request.orderId.replace('#', '')}`}
-                      className="text-primary hover:underline font-medium"
-                    >
-                      {request.orderId}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-foreground">{request.platformId}</td>
-                  <td className="px-4 py-3">
-                    <span className="font-mono text-foreground">{request.requestId}</span>
-                  </td>
-                  <td className="px-4 py-3 text-foreground text-xs">{request.raisedTime}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status="default">{request.requestType}</StatusBadge>
-                  </td>
-                  <td className="px-4 py-3 text-foreground">{request.raisedBy}</td>
-                  <td className="px-4 py-3 text-foreground">{request.assignedTo}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={getStatusType(request.status)}>{request.status}</StatusBadge>
-                  </td>
-
-                  {/* Refund Source Account column - visible only to Admin/Finance */}
-                  {canViewRefundAccount && (
+                return (
+                  <tr
+                    key={request.requestId}
+                    className={`border-b border-border last:border-b-0 ${
+                      index % 2 === 1 ? 'bg-muted/20' : ''
+                    } hover:bg-muted/30 transition-colors`}
+                  >
                     <td className="px-4 py-3">
-                      {showRefundAccount && request.refundSourceAccount ? (
-                        <div className="flex items-center gap-1">
-                          <span className="font-mono text-xs text-foreground">
-                            {isAccountVisible ? request.refundSourceAccount : maskAccount(request.refundSourceAccount)}
-                          </span>
-                          <button
-                            onClick={() => toggleAccountVisibility(request.requestId)}
-                            className="p-1 hover:bg-muted rounded transition-colors"
-                            title={isAccountVisible ? 'Hide account' : 'Show account'}
-                          >
-                            {isAccountVisible ? (
-                              <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                            ) : (
-                              <Eye className="h-3.5 w-3.5 text-muted-foreground" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => copyAccount(request.requestId, request.refundSourceAccount!)}
-                            className="p-1 hover:bg-muted rounded transition-colors"
-                            title="Copy account"
-                          >
-                            {copiedAccount === request.requestId ? (
-                              <Check className="h-3.5 w-3.5 text-green-500" />
-                            ) : (
-                              <Copy className="h-3.5 w-3.5 text-muted-foreground" />
-                            )}
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">NA</span>
-                      )}
+                      <Link
+                        href={`/orders/${request.orderId.replace('#', '')}`}
+                        className="text-primary hover:underline font-medium"
+                      >
+                        {request.orderId}
+                      </Link>
                     </td>
-                  )}
+                    <td className="px-4 py-3 text-foreground">{request.platformId}</td>
+                    <td className="px-4 py-3">
+                      <span className="font-mono text-foreground">{request.requestId}</span>
+                    </td>
+                    <td className="px-4 py-3 text-foreground text-xs">{request.raisedTime}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status="default">{request.requestType}</StatusBadge>
+                    </td>
+                    <td className="px-4 py-3 text-foreground">{request.raisedBy}</td>
+                    <td className="px-4 py-3 text-foreground">{request.assignedTo}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={getStatusType(request.status)}>{request.status}</StatusBadge>
+                    </td>
 
-                  {/* Remarks with expandable history */}
-                  <td className="px-4 py-3">
-                    <div className="max-w-56">
-                      <div className="flex items-start gap-1">
-                        <div className="flex-1">
-                          <p className="text-xs text-foreground line-clamp-2">{latestRemark?.text || 'No remarks'}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {latestRemark?.userName} - {latestRemark?.timestamp}
-                          </p>
+                    {/* Refund Source Account column - visible only to Admin/Finance */}
+                    {canViewRefundAccount && (
+                      <td className="px-4 py-3">
+                        {showRefundAccount && request.refundSourceAccount ? (
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono text-xs text-foreground">
+                              {isAccountVisible ? request.refundSourceAccount : maskAccount(request.refundSourceAccount)}
+                            </span>
+                            <button
+                              onClick={() => toggleAccountVisibility(request.requestId)}
+                              className="p-1 hover:bg-muted rounded transition-colors"
+                              title={isAccountVisible ? 'Hide account' : 'Show account'}
+                            >
+                              {isAccountVisible ? (
+                                <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                              ) : (
+                                <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => copyAccount(request.requestId, request.refundSourceAccount!)}
+                              className="p-1 hover:bg-muted rounded transition-colors"
+                              title="Copy account"
+                            >
+                              {copiedAccount === request.requestId ? (
+                                <Check className="h-3.5 w-3.5 text-green-500" />
+                              ) : (
+                                <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                              )}
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">NA</span>
+                        )}
+                      </td>
+                    )}
+
+                    {/* Remarks with expandable history */}
+                    <td className="px-4 py-3">
+                      <div className="max-w-56">
+                        <div className="flex items-start gap-1">
+                          <div className="flex-1">
+                            <p className="text-xs text-foreground line-clamp-2">{latestRemark?.text || 'No remarks'}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {latestRemark?.userName} - {latestRemark?.timestamp}
+                            </p>
+                          </div>
+                          {request.remarks.length > 1 && (
+                            <button
+                              onClick={() => toggleRemarks(request.requestId)}
+                              className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
+                              title={isExpanded ? 'Hide history' : 'Show history'}
+                            >
+                              {isExpanded ? (
+                                <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                              )}
+                            </button>
+                          )}
                         </div>
-                        {request.remarks.length > 1 && (
-                          <button
-                            onClick={() => toggleRemarks(request.requestId)}
-                            className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
-                            title={isExpanded ? 'Hide history' : 'Show history'}
-                          >
-                            {isExpanded ? (
-                              <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-                            ) : (
-                              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                            )}
-                          </button>
+                        {isExpanded && request.remarks.length > 1 && (
+                          <div className="mt-2 space-y-2 border-t border-border pt-2">
+                            {request.remarks.slice(0, -1).reverse().map((remarkItem, idx) => (
+                              <div key={idx} className="text-xs">
+                                <p className="text-foreground">{remarkItem.text}</p>
+                                <p className="text-muted-foreground">{remarkItem.userName} - {remarkItem.timestamp}</p>
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
-                      {isExpanded && request.remarks.length > 1 && (
-                        <div className="mt-2 space-y-2 border-t border-border pt-2">
-                          {request.remarks.slice(0, -1).reverse().map((remark, idx) => (
-                            <div key={idx} className="text-xs">
-                              <p className="text-foreground">{remark.text}</p>
-                              <p className="text-muted-foreground">{remark.userName} - {remark.timestamp}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Action menu - vertical three dots with dropdown (only for OPEN requests) */}
-                  <td className="px-4 py-3">
-                    {requestIsOpen && actionsWithState.length > 0 ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className="p-1.5 rounded hover:bg-muted transition-colors"
-                            aria-label="More actions"
-                          >
-                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-72">
-                          <DropdownMenuLabel className="text-xs text-muted-foreground">
-                            Actions for {request.requestType}
-                          </DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          {actionsWithState.map(({ action, enabled }) => (
-                            <DropdownMenuItem
-                              key={action.id}
-                              disabled={!enabled}
-                              onClick={() => enabled && openActionModal(request, action)}
-                              className="text-sm"
+                    {/* Action menu - vertical three dots with dropdown */}
+                    <td className="px-4 py-3">
+                      {actionsWithState.length > 0 ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className="p-1.5 rounded hover:bg-muted transition-colors"
+                              aria-label="More actions"
                             >
-                              {action.label}
-                              {!enabled && (
-                                <span className="ml-auto text-xs text-muted-foreground">
-                                  ({action.validRoles.join('/')})
-                                </span>
-                              )}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : (
-                      <span className="text-muted-foreground text-xs">-</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                              <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-72">
+                            <DropdownMenuLabel className="text-xs text-muted-foreground">
+                              Actions for {request.requestType}
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {actionsWithState.map(({ action, enabled }) => (
+                              <DropdownMenuItem
+                                key={action.id}
+                                disabled={!enabled}
+                                onClick={() => enabled && openActionModal(request, action)}
+                                className="text-sm"
+                              >
+                                {action.label}
+                                {!enabled && (
+                                  <span className="ml-auto text-xs text-muted-foreground">
+                                    ({action.validRoles.join('/')})
+                                  </span>
+                                )}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">-</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
@@ -905,7 +834,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
       {/* Pagination Footer */}
       <div className="flex items-center justify-between px-4 py-3 rounded-lg border border-border bg-card text-sm">
         <div className="text-muted-foreground">
-          Showing {paginatedRequests.length} of {sortedRequests.length} requests
+          Showing {paginatedRequests.length} of {sortedRequests.length} tasks
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -917,11 +846,11 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
             <ChevronLeft className="h-5 w-5" />
           </button>
           <span className="text-muted-foreground">
-            {currentPage} of {totalPages}
+            {currentPage} of {totalPages || 1}
           </span>
           <button
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || totalPages === 0}
             className="p-1 rounded hover:bg-muted disabled:opacity-50 transition-colors"
             aria-label="Next page"
           >
@@ -931,11 +860,11 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
       </div>
 
       {/* Action Modal */}
-      {actionModal.isOpen && actionModal.request && (
+      {actionModal.isOpen && actionModal.request && actionModal.action && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card border border-border rounded-lg shadow-xl w-full max-w-md mx-4">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <h3 className="text-lg font-semibold text-foreground">{actionModal.label}</h3>
+              <h3 className="text-lg font-semibold text-foreground">{actionModal.action.label}</h3>
               <button
                 onClick={closeActionModal}
                 className="p-1 hover:bg-muted rounded transition-colors"
@@ -948,10 +877,10 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
                 Request: <span className="text-foreground font-mono">{actionModal.request.requestId}</span>
               </div>
 
-              {(actionModal.requiresRemark || actionModal.action === 'add_remark') && (
+              {actionModal.action.requiresRemark && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1">
-                    Remark {actionModal.requiresRemark && <span className="text-red-500">*</span>}
+                    Remark <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={actionFormData.remark}
@@ -963,7 +892,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
                 </div>
               )}
 
-              {actionModal.requiresAccount && (
+              {actionModal.action.requiresAccount && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1">
                     Refund Source Account <span className="text-red-500">*</span>
@@ -978,7 +907,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
                 </div>
               )}
 
-              {actionModal.requiresUTR && (
+              {actionModal.action.requiresUTR && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1">
                     UTR Number <span className="text-red-500">*</span>
@@ -993,10 +922,10 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
                 </div>
               )}
             </div>
-            <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border">
+            <div className="flex justify-end gap-2 px-4 py-3 border-t border-border">
               <button
                 onClick={closeActionModal}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="px-4 py-2 rounded-md border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 Cancel
               </button>
@@ -1004,7 +933,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
                 onClick={handleActionSubmit}
                 className="btn-primary"
               >
-                Submit
+                Confirm
               </button>
             </div>
           </div>
