@@ -725,24 +725,26 @@ export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrent
           <option value="status">Sort By: Status</option>
         </select>
 
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
-            value={dateRange.start}
-            onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-            className="w-24 px-2 py-1 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="DD/MM/YYYY"
-          />
-          <span className="text-muted-foreground">-</span>
-          <input
-            type="text"
-            value={dateRange.end}
-            onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-            className="w-24 px-2 py-1 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="DD/MM/YYYY"
-          />
-        </div>
+  <div className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-border bg-card">
+    <Calendar className="h-4 w-4 text-primary/70" />
+    <div className="flex items-center gap-2">
+      <input
+        type="text"
+        value={dateRange.start}
+        onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+        className="w-28 px-2.5 py-1.5 rounded-sm border border-border/60 bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-muted-foreground/50"
+        placeholder="DD/MM/YYYY"
+      />
+      <span className="text-muted-foreground font-medium">—</span>
+      <input
+        type="text"
+        value={dateRange.end}
+        onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+        className="w-28 px-2.5 py-1.5 rounded-sm border border-border/60 bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-muted-foreground/50"
+        placeholder="DD/MM/YYYY"
+      />
+    </div>
+  </div>
       </div>
 
       {/* Table */}
