@@ -745,7 +745,7 @@ export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrent
           </span>
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-[340px]" align="start" side="bottom">
+      <PopoverContent className="w-auto" align="start" side="bottom">
         <div className="space-y-4">
           <div className="space-y-1">
             <h3 className="text-sm font-semibold text-foreground">Select Date Range</h3>

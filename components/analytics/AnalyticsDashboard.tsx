@@ -542,44 +542,44 @@ export function AnalyticsDashboard() {
               <span className="text-foreground font-medium">{formatRangeLabel(dashboardAppliedRange.from, dashboardAppliedRange.to)}</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-[340px]" align="end" side="bottom">
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">Select Date Range</h3>
-                <p className="text-xs text-muted-foreground">Choose start and end dates for dashboard metrics</p>
+            <PopoverContent className="w-auto" align="end" side="bottom">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-semibold text-foreground">Select Date Range</h3>
+                  <p className="text-xs text-muted-foreground">Choose start and end dates for dashboard metrics</p>
+                </div>
+                <DateRangeCalendar
+                  mode="range"
+                  numberOfMonths={2}
+                  disabled={{ after: new Date() }}
+                  selected={dashboardDraftRange}
+                  onSelect={(range) => setDashboardDraftRange(range ?? dashboardDraftRange)}
+                />
+                <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setDashboardDraftRange(dashboardAppliedRange);
+                      setDashboardPopoverOpen(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      if (dashboardDraftRange.from && dashboardDraftRange.to) {
+                        setDashboardAppliedRange(dashboardDraftRange);
+                      }
+                      setDashboardPopoverOpen(false);
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </div>
               </div>
-              <DateRangeCalendar
-                mode="range"
-                numberOfMonths={2}
-                disabled={{ after: new Date() }}
-                selected={dashboardDraftRange}
-                onSelect={(range) => setDashboardDraftRange(range ?? dashboardDraftRange)}
-              />
-              <div className="flex justify-end gap-2 pt-2 border-t border-border">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setDashboardDraftRange(dashboardAppliedRange);
-                    setDashboardPopoverOpen(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    if (dashboardDraftRange.from && dashboardDraftRange.to) {
-                      setDashboardAppliedRange(dashboardDraftRange);
-                    }
-                    setDashboardPopoverOpen(false);
-                  }}
-                >
-                  Apply
-                </Button>
-              </div>
-            </div>
-          </PopoverContent>
+            </PopoverContent>
         </Popover>
       </div>
 
@@ -609,7 +609,7 @@ export function AnalyticsDashboard() {
                         <span>{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[340px]" side="top">
+                    <PopoverContent className="w-auto" side="top">
                       <div className="space-y-4">
                         <div className="space-y-1">
                           <h3 className="text-sm font-semibold text-foreground">Chart Date Range</h3>
@@ -812,7 +812,7 @@ export function AnalyticsDashboard() {
                         <span>{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[340px]" side="top">
+                    <PopoverContent className="w-auto" side="top">
                       <div className="space-y-4">
                         <div className="space-y-1">
                           <h3 className="text-sm font-semibold text-foreground">Chart Date Range</h3>
@@ -991,7 +991,7 @@ export function AnalyticsDashboard() {
                         <span>{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[340px]" side="top">
+                    <PopoverContent className="w-auto" side="top">
                       <div className="space-y-4">
                         <div className="space-y-1">
                           <h3 className="text-sm font-semibold text-foreground">Chart Date Range</h3>
