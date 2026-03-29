@@ -17,14 +17,14 @@ export function DataTable<T extends Record<string, any>>({
   className = '',
 }: DataTableProps<T>) {
   return (
-    <div className={`overflow-x-auto ${className}`}>
+    <div className={`overflow-x-auto border border-border rounded-lg bg-card shadow-sm ${className}`}>
       <table className="w-full text-sm">
         <thead>
-          <tr className="table-header border-b border-border">
+          <tr className="border-b border-border bg-muted/40">
             {columns.map((column, index) => (
               <th
                 key={index}
-                className={`px-4 py-3 text-left font-medium ${column.className || ''}`}
+                className={`px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide ${column.className || ''}`}
               >
                 {column.header}
               </th>
@@ -35,7 +35,7 @@ export function DataTable<T extends Record<string, any>>({
           {data.map((row, rowIndex) => (
             <tr
               key={rowIndex}
-              className="table-row-alt border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors"
+              className="border-b border-border/50 last:border-b-0 hover:bg-muted/50 transition-colors duration-150"
             >
               {columns.map((column, colIndex) => (
                 <td

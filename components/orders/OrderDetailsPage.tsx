@@ -168,7 +168,7 @@ export function OrderDetailsPage({ orderId }: OrderDetailsPageProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Order Overview */}
       <OrderOverviewCard
         brand={mockOrderData.brand}

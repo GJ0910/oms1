@@ -110,12 +110,12 @@ export function Sidebar() {
       >
         <div className="flex min-h-full flex-col p-4 sm:p-6">
           {/* Branding */}
-          <div className="mb-8 flex items-center gap-2">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">NGF</span>
+          <div className="mb-8 flex items-center gap-3 px-2">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary shadow-md">
+              <span className="text-xs font-bold text-primary-foreground">NGF</span>
             </div>
             <div>
-              <h1 className="font-semibold text-foreground">No Guilt Fitness</h1>
+              <h1 className="font-semibold text-foreground leading-tight">No Guilt Fitness</h1>
               <p className="text-xs text-muted-foreground">Order Management</p>
             </div>
           </div>
@@ -125,10 +125,10 @@ export function Sidebar() {
             {/* My Tasks - Direct navigation item */}
             <Link
               href="/tasks"
-              className={`flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
                 isActive('/tasks')
-                  ? 'bg-sidebar-primary font-medium text-sidebar-primary-foreground'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                  ? 'bg-primary/20 font-semibold text-primary shadow-sm'
+                  : 'text-foreground hover:bg-muted/60'
               }`}
               onClick={() => {
                 if (window.innerWidth < 1024) {
@@ -136,7 +136,7 @@ export function Sidebar() {
                 }
               }}
             >
-              <CheckCircle2 className="h-4 w-4" />
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
               <span>My Tasks</span>
             </Link>
 
@@ -145,18 +145,18 @@ export function Sidebar() {
               <div key={group}>
                 <button
                   onClick={() => toggleGroup(group)}
-                  className={`w-full rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${expandedGroups[group]
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                  className={`w-full rounded-md px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${expandedGroups[group]
+                      ? 'bg-muted/70 text-foreground shadow-sm'
+                      : 'text-foreground hover:bg-muted/50'
                     }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4 flex-shrink-0" />
                       <span>{label}</span>
                     </div>
                     <ChevronDown
-                      className={`h-4 w-4 transition-transform ${expandedGroups[group] ? 'rotate-180' : ''
+                      className={`h-4 w-4 transition-transform duration-200 flex-shrink-0 ${expandedGroups[group] ? 'rotate-180' : ''
                         }`}
                     />
                   </div>
@@ -164,17 +164,17 @@ export function Sidebar() {
 
                 {/* Submenu */}
                 {expandedGroups[group] && (
-                  <div className="ml-2 mt-1 space-y-0.5 border-l-2 border-sidebar-border">
+                  <div className="ml-2 mt-1 space-y-0.5 border-l-2 border-border/40 pl-3">
                     {items.map(({ label: itemLabel, href, icon: ItemIcon }) => (
                       <Link
                         key={href}
                         href={href}
-                        className={`flex items-center gap-3 rounded-md px-4 py-2 pl-6 text-sm transition-colors ${isActive(href)
-                            ? 'bg-sidebar-primary font-medium text-sidebar-primary-foreground'
-                            : 'text-sidebar-foreground hover:bg-sidebar-accent/30'
+                        className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-all duration-200 ${isActive(href)
+                            ? 'bg-primary/20 font-semibold text-primary shadow-sm'
+                            : 'text-foreground hover:bg-muted/50'
                           }`}
                       >
-                        <ItemIcon className="h-4 w-4" />
+                        <ItemIcon className="h-4 w-4 flex-shrink-0" />
                         <span>{itemLabel}</span>
                       </Link>
                     ))}
@@ -185,7 +185,7 @@ export function Sidebar() {
           </nav>
 
           {/* Footer */}
-          <div className="mt-6 border-t border-sidebar-border px-2 pt-4 text-xs text-sidebar-accent-foreground">
+          <div className="mt-6 border-t border-border/40 px-2 pt-4 text-xs text-muted-foreground/70">
             <p>© 2024 No Guilt Fitness</p>
           </div>
         </div>

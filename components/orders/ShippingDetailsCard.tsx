@@ -18,15 +18,15 @@ export function ShippingDetailsCard({
   const fullAddress = `${address}, ${city}, ${state}, ${country} ${pincode}`;
 
   return (
-    <div className="card-section">
-      <h2 className="card-title">Shipping Details</h2>
+    <div className="rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-foreground mb-5">Shipping Details</h2>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-5 sm:gap-6">
         {/* Full Address */}
         <div>
-          <div className="field-label mb-2">Full Address</div>
-          <div className="flex items-start justify-between gap-4 p-3 rounded-md bg-muted/30 border border-border">
-            <div className="field-value text-sm flex-1 leading-relaxed">{fullAddress}</div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Full Address</div>
+          <div className="flex items-start justify-between gap-4 p-3.5 rounded-lg bg-muted/20 border border-border/50">
+            <div className="text-sm text-foreground flex-1 leading-relaxed">{fullAddress}</div>
             <CopyButton text={fullAddress} label="Copy" className="flex-shrink-0" />
           </div>
         </div>
@@ -34,28 +34,28 @@ export function ShippingDetailsCard({
         {/* Address breakdown */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           <div>
-            <div className="field-label">Address</div>
-            <div className="field-value">{address}</div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Address</div>
+            <div className="text-sm text-foreground">{address}</div>
           </div>
 
           <div>
-            <div className="field-label">City</div>
-            <div className="field-value">{city}</div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">City</div>
+            <div className="text-sm text-foreground">{city}</div>
           </div>
 
           <div>
-            <div className="field-label">State</div>
-            <div className="field-value">{state}</div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">State</div>
+            <div className="text-sm text-foreground">{state}</div>
           </div>
 
           <div>
-            <div className="field-label">Country</div>
-            <div className="field-value">{country}</div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Country</div>
+            <div className="text-sm text-foreground">{country}</div>
           </div>
 
           <div>
-            <div className="field-label">Pincode</div>
-            <div className="field-value font-mono">{pincode}</div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Pincode</div>
+            <div className="text-sm font-mono text-foreground">{pincode}</div>
           </div>
         </div>
       </div>

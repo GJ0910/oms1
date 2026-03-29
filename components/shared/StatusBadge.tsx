@@ -5,7 +5,7 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, children, className = '' }: StatusBadgeProps) {
-  const baseClasses = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium';
+  const baseClasses = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold shadow-sm';
   
   const statusClasses = {
     success: 'badge-success',

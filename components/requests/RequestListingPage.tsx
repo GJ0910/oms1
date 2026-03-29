@@ -692,23 +692,23 @@ export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrent
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center bg-card rounded-lg p-4 border border-border">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center bg-card rounded-lg p-4 sm:p-5 border border-border shadow-sm">
         <button
           onClick={handleExport}
-          className="btn-primary flex items-center gap-2 whitespace-nowrap"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all duration-200 active:scale-95 whitespace-nowrap shadow-sm"
         >
           <Download className="h-4 w-4" />
           Export {sortedRequests.length} Requests
         </button>
 
         <form onSubmit={handleSearch} className="flex-1 relative min-w-0">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
           <input
             type="text"
-            placeholder="Search by name, email, phone, Order ID, Request ID"
+            placeholder="Search by Order ID, Request ID, name, email..."
             value={localSearchQuery}
             onChange={(e) => setLocalSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
           />
         </form>
 
@@ -718,7 +718,7 @@ export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrent
             setSortBy(e.target.value);
             setCurrentPage(1);
           }}
-          className="px-4 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+          className="px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium transition-all hover:bg-muted/40"
         >
           <option value="date">Sort By: Date</option>
           <option value="type">Sort By: Type</option>
@@ -751,24 +751,24 @@ export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrent
       <div className="rounded-lg border border-border bg-card overflow-x-auto shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order ID</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Platform ID</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Request ID</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Raised Time</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Request Type</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Raised By</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Assigned To</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Status</th>
+            <tr className="border-b border-border bg-muted/40">
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Order ID</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Platform ID</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Request ID</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Raised Time</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Request Type</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Raised By</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Assigned To</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Status</th>
               {canViewRefundAccount && (
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Refund Account</th>
+                <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Refund Account</th>
               )}
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Remarks</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Action</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Remarks</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Action</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedRequests.map((request, index) => {
+            {paginatedRequests.map((request) => {
               const availableActions = currentUser
                 ? getAvailableActions(request.requestType, request.status, request.assignedTo, currentUser.role)
                 : [];
@@ -780,9 +780,7 @@ export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrent
               return (
                 <tr
                   key={request.requestId}
-                  className={`border-b border-border last:border-b-0 ${
-                    index % 2 === 1 ? 'bg-muted/20' : ''
-                  } hover:bg-muted/30 transition-colors`}
+                  className="border-b border-border/50 last:border-b-0 hover:bg-muted/50 transition-colors duration-150"
                 >
                   <td className="px-4 py-3">
                     <Link
@@ -923,29 +921,29 @@ export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrent
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex items-center justify-between px-4 py-3 rounded-lg border border-border bg-card text-sm">
+      <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 rounded-lg border border-border bg-card text-sm shadow-sm">
         <div className="text-muted-foreground">
-          Showing {paginatedRequests.length} of {sortedRequests.length} requests
+          Showing <span className="font-semibold text-foreground">{paginatedRequests.length}</span> of <span className="font-semibold text-foreground">{sortedRequests.length}</span> requests
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="p-1 rounded hover:bg-muted disabled:opacity-50 transition-colors"
+            className="p-2 rounded-lg hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             aria-label="Previous page"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="text-muted-foreground">
-            {currentPage} of {totalPages}
+          <span className="text-muted-foreground px-2 py-1 rounded">
+            <span className="font-semibold text-foreground">{currentPage}</span> / <span className="font-semibold text-foreground">{totalPages}</span>
           </span>
           <button
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="p-1 rounded hover:bg-muted disabled:opacity-50 transition-colors"
+            className="p-2 rounded-lg hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             aria-label="Next page"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>

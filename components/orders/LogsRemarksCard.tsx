@@ -41,11 +41,11 @@ export function LogsRemarksCard({ logs, onAddRemark }: LogsRemarksCardProps) {
   }));
 
   return (
-    <div className="card-section">
-      <h2 className="card-title">Order Remarks & Logs</h2>
+    <div className="rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-foreground mb-5">Order Remarks & Logs</h2>
 
       {/* Activity Logs */}
-      <div className="mb-8 pb-8 border-b border-border">
+      <div className="mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-border/50">
         <h3 className="text-sm font-semibold text-foreground mb-4">Activity Logs</h3>
         {logs.length > 0 ? (
           <Timeline items={items} />
@@ -64,7 +64,7 @@ export function LogsRemarksCard({ logs, onAddRemark }: LogsRemarksCardProps) {
             value={remarkText}
             onChange={(e) => setRemarkText(e.target.value)}
             placeholder="Enter your remark or note for this order..."
-            className="w-full min-h-24 px-3 py-2 rounded-md border border-border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+            className="w-full min-h-24 px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none text-sm"
             disabled={isSubmitting}
           />
           <div className="flex items-center justify-between">
@@ -74,7 +74,7 @@ export function LogsRemarksCard({ logs, onAddRemark }: LogsRemarksCardProps) {
             <button
               onClick={handleAddRemark}
               disabled={!remarkText.trim() || isSubmitting}
-              className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MessageSquare className="h-4 w-4" />
               Add Remark
