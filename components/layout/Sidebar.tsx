@@ -16,6 +16,7 @@ import {
   ClipboardList,
   FileText,
   Files,
+  CheckCircle2,
 } from 'lucide-react';
 import { getAuthUser, hasPermission, type AuthUser } from '@/lib/auth';
 
@@ -121,6 +122,25 @@ export function Sidebar() {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 overflow-y-auto">
+            {/* My Tasks - Direct navigation item */}
+            <Link
+              href="/tasks"
+              className={`flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
+                isActive('/tasks')
+                  ? 'bg-sidebar-primary font-medium text-sidebar-primary-foreground'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+              }`}
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  setIsOpen(false);
+                }
+              }}
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              <span>My Tasks</span>
+            </Link>
+
+            {/* Groups */}
             {navItems.map(({ group, label, icon: Icon, items }) => (
               <div key={group}>
                 <button

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search, ChevronDown, Calendar, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -116,6 +117,7 @@ const generateRemainingOrders = (): OrderData[] => {
 };
 
 export function OrderListingPage() {
+  const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
@@ -129,18 +131,61 @@ export function OrderListingPage() {
   // Use static mock orders combined with generated ones
   const allOrders = useMemo(() => generateRemainingOrders(), []);
 
-  // Filter orders based on search
+  // Filter orders based on URL params and search
   const filteredOrders = useMemo(() => {
+    let results = [...allOrders];
+
+    // Apply URL filter params
+    const statusParam = searchParams.get('status');
+    const paymentTypeParam = searchParams.get('paymentType');
+    const sourceParam = searchParams.get('source');
+    const isRTOParam = searchParams.get('isRTO');
+    const isReplacementParam = searchParams.get('isReplacement');
+
+    // Filter by status if provided
+    if (statusParam) {
+      results = results.filter(order => 
+        order.orderStatus.toLowerCase() === statusParam.toLowerCase()
+      );
+    }
+
+    // Filter by payment type if provided
+    if (paymentTypeParam) {
+      results = results.filter(order =>
+        order.paymentMethod.toLowerCase().replace(/\s+/g, '') === paymentTypeParam.toLowerCase().replace(/\s+/g, '')
+      );
+    }
+
+    // Filter by source (order type) if provided
+    if (sourceParam) {
+      results = results.filter(order => order.orderType.toLowerCase() === sourceParam.toLowerCase());
+    }
+
+    // Filter by isRTO if provided
+    if (isRTOParam === 'true') {
+      results = results.filter(order => order.orderStatus.toLowerCase().includes('rto'));
+    }
+
+    // Filter by isReplacement if provided
+    if (isReplacementParam === 'true') {
+      results = results.filter(order => order.orderStatus.toLowerCase().includes('replacement'));
+    }
+
+    // Apply text search if provided
     const query = searchQuery.toLowerCase();
-    return allOrders.filter(order =>
-      order.id.toLowerCase().includes(query) ||
-      order.brand.toLowerCase().includes(query) ||
-      order.platformId.toLowerCase().includes(query) ||
-      order.awb.toLowerCase().includes(query) ||
-      (order.customerEmail?.toLowerCase().includes(query)) ||
-      (order.customerPhone?.includes(query))
-    );
-  }, [allOrders, searchQuery]);
+    if (query.trim()) {
+      results = results.filter(order =>
+        order.id.toLowerCase().includes(query) ||
+        order.brand.toLowerCase().includes(query) ||
+        order.platformId.toLowerCase().includes(query) ||
+        order.awb.toLowerCase().includes(query) ||
+        (order.customerEmail?.toLowerCase().includes(query)) ||
+        (order.customerPhone?.includes(query))
+      );
+    }
+
+    return results;
+  }, [allOrders, searchQuery, searchParams]);
 
   // Sort orders
   const sortedOrders = useMemo(() => {

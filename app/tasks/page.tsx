@@ -1,11 +1,11 @@
 'use client';
 
 import { AppLayout } from '@/components/layout/AppLayout';
-import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
+import { RequestListingPage } from '@/components/requests/RequestListingPage';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { Spinner } from '@/components/ui/spinner';
 
-export default function OrderAnalyticsPage() {
+export default function MyTasksPage() {
   const { isLoading } = useAuthGuard();
 
   if (isLoading) {
@@ -18,10 +18,12 @@ export default function OrderAnalyticsPage() {
 
   return (
     <AppLayout
-      headerTitle="Order Analytics"
-      breadcrumbs={[{ label: 'Analytics', href: '/analytics' }, { label: 'Order Analytics' }]}
+      headerTitle="My Tasks"
+      breadcrumbs={[
+        { label: 'My Tasks', href: '/tasks' },
+      ]}
     >
-      <AnalyticsDashboard />
+      <RequestListingPage showOnlyOpen={true} showAssignedToCurrentUserOnly={true} />
     </AppLayout>
   );
 }

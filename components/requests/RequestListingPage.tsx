@@ -392,9 +392,10 @@ function getAvailableActions(
 
 interface RequestListingPageProps {
   showOnlyOpen?: boolean;
+  showAssignedToCurrentUserOnly?: boolean;
 }
 
-export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageProps) {
+export function RequestListingPage({ showOnlyOpen = false, showAssignedToCurrentUserOnly = false }: RequestListingPageProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date');
   const [localSearchQuery, setLocalSearchQuery] = useState('');
@@ -451,6 +452,10 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
       filtered = filtered.filter((request) => isRequestOpen(request.requestType, request.status));
     }
 
+    if (showAssignedToCurrentUserOnly && currentUser) {
+      filtered = filtered.filter((request) => request.assignedTo === currentUser.role);
+    }
+
     if (activeSearch.trim()) {
       const query = activeSearch.toLowerCase();
       filtered = filtered.filter(
@@ -464,7 +469,7 @@ export function RequestListingPage({ showOnlyOpen = false }: RequestListingPageP
     }
 
     return filtered;
-  }, [requests, showOnlyOpen, activeSearch]);
+  }, [requests, showOnlyOpen, showAssignedToCurrentUserOnly, currentUser, activeSearch]);
 
   // Sort requests
   const sortedRequests = useMemo(() => {

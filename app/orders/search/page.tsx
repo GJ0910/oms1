@@ -90,17 +90,46 @@ export default function SearchOrdersPage() {
 
   // useMemo must be called unconditionally
   const filteredOrders = useMemo(() => {
-    if (!activeSearch.trim()) return [];
+    let results = [...MOCK_ORDERS];
 
-    const query = activeSearch.toLowerCase();
-    return MOCK_ORDERS.filter(order =>
-      order.id.toLowerCase().includes(query) ||
-      order.platformId.toLowerCase().includes(query) ||
-      order.awb.toLowerCase().includes(query) ||
-      (order.customerEmail?.toLowerCase().includes(query)) ||
-      (order.customerPhone?.includes(query))
-    );
-  }, [activeSearch]);
+    // Apply filter params from URL
+    const statusParam = searchParams.get('status');
+    const paymentTypeParam = searchParams.get('paymentType');
+    const sourceParam = searchParams.get('source');
+    const isRTOParam = searchParams.get('isRTO');
+    const isReplacementParam = searchParams.get('isReplacement');
+
+    // Filter by status if provided
+    if (statusParam) {
+      results = results.filter(order => order.orderStatus === statusParam);
+    }
+
+    // Filter by payment type if provided
+    if (paymentTypeParam) {
+      results = results.filter(order => 
+        order.paymentMethod.toLowerCase().replace(/\s+/g, '') === paymentTypeParam.toLowerCase().replace(/\s+/g, '')
+      );
+    }
+
+    // Filter by source (order type/brand mapping) if provided
+    if (sourceParam) {
+      results = results.filter(order => order.orderType.toLowerCase() === sourceParam.toLowerCase());
+    }
+
+    // Apply text search if provided
+    if (activeSearch.trim()) {
+      const query = activeSearch.toLowerCase();
+      results = results.filter(order =>
+        order.id.toLowerCase().includes(query) ||
+        order.platformId.toLowerCase().includes(query) ||
+        order.awb.toLowerCase().includes(query) ||
+        (order.customerEmail?.toLowerCase().includes(query)) ||
+        (order.customerPhone?.includes(query))
+      );
+    }
+
+    return results;
+  }, [activeSearch, searchParams]);
 
   // Derived values (not hooks, safe to compute after hooks)
   const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE);
@@ -165,7 +194,7 @@ export default function SearchOrdersPage() {
         </div>
 
         {/* Results or empty state */}
-        {activeSearch.trim() === '' ? (
+        {activeSearch.trim() === '' && !searchParams.get('status') && !searchParams.get('paymentType') && !searchParams.get('source') ? (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium text-foreground mb-2">Search for orders</p>
@@ -174,7 +203,7 @@ export default function SearchOrdersPage() {
         ) : filteredOrders.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg font-medium text-foreground mb-2">No orders found</p>
-            <p className="text-sm text-muted-foreground">Try adjusting your search terms</p>
+            <p className="text-sm text-muted-foreground">Try adjusting your search terms or filters</p>
           </div>
         ) : (
           <>
