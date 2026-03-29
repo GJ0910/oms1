@@ -267,7 +267,10 @@ export function AnalyticsDashboard() {
     to: new Date("2026-03-17"),
   })
 
-  const [chartDraftRange, setChartDraftRange] = useState<{ from: Date; to: Date } | null>(null)
+  const [chartDraftRange, setChartDraftRange] = useState<{ from: Date; to: Date }>({
+    from: new Date("2026-02-15"),
+    to: new Date("2026-03-17"),
+  })
   const [chartPopoverOpen, setChartPopoverOpen] = useState(false)
 
   // Dashboard range state (applied + draft)
@@ -276,7 +279,10 @@ export function AnalyticsDashboard() {
     to: new Date("2026-03-17"),
   })
 
-  const [dashboardDraftRange, setDashboardDraftRange] = useState<{ from: Date; to: Date } | null>(null)
+  const [dashboardDraftRange, setDashboardDraftRange] = useState<{ from: Date; to: Date }>({
+    from: new Date("2026-02-15"),
+    to: new Date("2026-03-17"),
+  })
   const [dashboardPopoverOpen, setDashboardPopoverOpen] = useState(false)
 
   const formatRangeLabel = (from: Date, to: Date) => {

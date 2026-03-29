@@ -3,9 +3,12 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Search, ChevronDown, Calendar, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronDown, Calendar as CalendarIcon, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CopyButton } from '@/components/shared/CopyButton';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar as DateRangeCalendar } from '@/components/ui/calendar';
 
 import { ORDER_TYPES, ORDER_STATUSES, shouldHaveAWB, canHaveClone, generateOrderId } from '@/lib/types';
 import type { OrderType, OrderStatus } from '@/lib/types';
@@ -121,10 +124,12 @@ export function OrderListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
-  const [dateRange, setDateRange] = useState({
-    start: '27/02/2026',
-    end: '03/03/2026',
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({
+    from: new Date(2026, 1, 27), // Feb 27, 2026
+    to: new Date(2026, 2, 3),    // Mar 3, 2026
   });
+  const [draftDateRange, setDraftDateRange] = useState<{ from?: Date; to?: Date }>(dateRange);
 
   const PAGE_SIZE = 10;
 
@@ -265,27 +270,60 @@ export function OrderListingPage() {
           <option value="status">Sort By: Status</option>
         </select>
 
-        {/* Date Range */}
-        <div className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-border bg-card">
-          <Calendar className="h-4 w-4 text-primary/70" />
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={dateRange.start}
-              onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-              className="w-28 px-2.5 py-1.5 rounded-sm border border-border/60 bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-muted-foreground/50"
-              placeholder="DD/MM/YYYY"
-            />
-            <span className="text-muted-foreground font-medium">—</span>
-            <input
-              type="text"
-              value={dateRange.end}
-              onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-              className="w-28 px-2.5 py-1.5 rounded-sm border border-border/60 bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-muted-foreground/50"
-              placeholder="DD/MM/YYYY"
-            />
-          </div>
-        </div>
+        {/* Date Range Selector */}
+        <Popover open={datePopoverOpen} onOpenChange={(open) => {
+          setDatePopoverOpen(open);
+          if (open) setDraftDateRange(dateRange);
+        }}>
+          <PopoverTrigger asChild>
+            <button className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-border bg-card text-sm font-medium text-foreground hover:bg-muted/60 hover:border-border/80 transition-all duration-200 active:scale-95">
+              <CalendarIcon className="h-4 w-4 text-primary/70" />
+              <span>
+                {dateRange.from && dateRange.to
+                  ? `${dateRange.from.toLocaleDateString('en-IN')} - ${dateRange.to.toLocaleDateString('en-IN')}`
+                  : 'Select date range'}
+              </span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[340px]" align="start" side="bottom">
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-semibold text-foreground">Select Date Range</h3>
+                <p className="text-xs text-muted-foreground">Choose start and end dates to filter orders</p>
+              </div>
+              <DateRangeCalendar
+                mode="range"
+                numberOfMonths={2}
+                disabled={{ after: new Date() }}
+                selected={draftDateRange}
+                onSelect={(range) => setDraftDateRange(range ?? draftDateRange)}
+              />
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setDraftDateRange(dateRange);
+                    setDatePopoverOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (draftDateRange.from && draftDateRange.to) {
+                      setDateRange(draftDateRange);
+                    }
+                    setDatePopoverOpen(false);
+                  }}
+                >
+                  Apply
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Table */}
