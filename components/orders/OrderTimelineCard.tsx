@@ -33,8 +33,8 @@ export function OrderTimelineCard({ events }: OrderTimelineCardProps) {
   }));
 
   return (
-    <div className="card-section">
-      <h2 className="card-title">Order Timeline</h2>
+    <div className="rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-foreground mb-5">Order Timeline</h2>
       <Timeline items={items} />
     </div>
   );

@@ -3,9 +3,12 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Search, ChevronDown, Calendar, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronDown, Calendar as CalendarIcon, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CopyButton } from '@/components/shared/CopyButton';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar as DateRangeCalendar } from '@/components/ui/calendar';
 
 import { ORDER_TYPES, ORDER_STATUSES, shouldHaveAWB, canHaveClone, generateOrderId } from '@/lib/types';
 import type { OrderType, OrderStatus } from '@/lib/types';
@@ -121,10 +124,12 @@ export function OrderListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
-  const [dateRange, setDateRange] = useState({
-    start: '27/02/2026',
-    end: '03/03/2026',
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({
+    from: new Date(2026, 1, 27), // Feb 27, 2026
+    to: new Date(2026, 2, 3),    // Mar 3, 2026
   });
+  const [draftDateRange, setDraftDateRange] = useState<{ from?: Date; to?: Date }>(dateRange);
 
   const PAGE_SIZE = 10;
 
@@ -227,11 +232,11 @@ export function OrderListingPage() {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center bg-card rounded-lg p-4 border border-border">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center bg-card rounded-lg p-4 sm:p-5 border border-border shadow-sm">
         {/* Export Button */}
         <button
           onClick={handleExport}
-          className="btn-primary flex items-center gap-2 whitespace-nowrap"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all duration-200 active:scale-95 whitespace-nowrap shadow-sm"
         >
           <Download className="h-4 w-4" />
           Export {sortedOrders.length} Orders
@@ -239,16 +244,16 @@ export function OrderListingPage() {
 
         {/* Search */}
         <div className="flex-1 relative min-w-0">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
           <input
             type="text"
-            placeholder="Search Orders"
+            placeholder="Search by Order ID, Platform ID, AWB..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
           />
         </div>
 
@@ -259,58 +264,91 @@ export function OrderListingPage() {
             setSortBy(e.target.value);
             setCurrentPage(1);
           }}
-          className="px-4 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+          className="px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium transition-all hover:bg-muted/40"
         >
           <option value="date">Sort By: Date</option>
           <option value="status">Sort By: Status</option>
         </select>
 
-        {/* Date Range */}
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
-            value={dateRange.start}
-            onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-            className="w-24 px-2 py-1 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="DD/MM/YYYY"
-          />
-          <span className="text-muted-foreground">-</span>
-          <input
-            type="text"
-            value={dateRange.end}
-            onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-            className="w-24 px-2 py-1 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="DD/MM/YYYY"
-          />
-        </div>
+        {/* Date Range Selector */}
+        <Popover open={datePopoverOpen} onOpenChange={(open) => {
+          setDatePopoverOpen(open);
+          if (open) setDraftDateRange(dateRange);
+        }}>
+          <PopoverTrigger asChild>
+            <button className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-border bg-card text-sm font-medium text-foreground hover:bg-muted/60 hover:border-border/80 transition-all duration-200 active:scale-95">
+              <CalendarIcon className="h-4 w-4 text-primary/70" />
+              <span>
+                {dateRange.from && dateRange.to
+                  ? `${dateRange.from.toLocaleDateString('en-IN')} - ${dateRange.to.toLocaleDateString('en-IN')}`
+                  : 'Select date range'}
+              </span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto" align="start" side="bottom">
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-semibold text-foreground">Select Date Range</h3>
+                <p className="text-xs text-muted-foreground">Choose start and end dates to filter orders</p>
+              </div>
+              <DateRangeCalendar
+                mode="range"
+                numberOfMonths={2}
+                disabled={{ after: new Date() }}
+                selected={draftDateRange}
+                onSelect={(range) => setDraftDateRange(range ?? draftDateRange)}
+              />
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setDraftDateRange(dateRange);
+                    setDatePopoverOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (draftDateRange.from && draftDateRange.to) {
+                      setDateRange(draftDateRange);
+                    }
+                    setDatePopoverOpen(false);
+                  }}
+                >
+                  Apply
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Table */}
       <div className="rounded-lg border border-border bg-card overflow-x-auto shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Brand</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order Type</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order Total</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Platform ID</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Payment Method</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Order Status</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">AWB</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Refund Status</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Clone Order</th>
-              <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Clone Order Status</th>
+            <tr className="border-b border-border bg-muted/40">
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Order</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Brand</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Order Type</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Order Total</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Platform ID</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Payment Method</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Order Status</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">AWB</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Refund Status</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Clone Order</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-foreground uppercase tracking-wide">Clone Order Status</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedOrders.map((order, index) => (
+            {paginatedOrders.map((order) => (
               <tr
                 key={order.id}
-                className={`border-b border-border last:border-b-0 ${
-                  index % 2 === 1 ? 'bg-muted/20' : ''
-                } hover:bg-muted/30 transition-colors`}
+                className="border-b border-border/50 last:border-b-0 hover:bg-muted/50 transition-colors duration-150"
               >
                 {/* Order ID + Timestamp */}
                 <td className="px-4 py-3">
@@ -399,32 +437,32 @@ export function OrderListingPage() {
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex items-center justify-between px-4 py-3 rounded-lg border border-border bg-card text-sm">
+      <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 rounded-lg border border-border bg-card text-sm shadow-sm">
         <div className="text-muted-foreground">
-          Showing {paginatedOrders.length} of {sortedOrders.length} orders
+          Showing <span className="font-semibold text-foreground">{paginatedOrders.length}</span> of <span className="font-semibold text-foreground">{sortedOrders.length}</span> orders
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="p-1 rounded hover:bg-muted disabled:opacity-50 transition-colors"
+            className="p-2 rounded-lg hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             aria-label="Previous page"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
 
-          <span className="text-muted-foreground">
-            {currentPage} of {totalPages}
+          <span className="text-muted-foreground px-2 py-1 rounded">
+            <span className="font-semibold text-foreground">{currentPage}</span> / <span className="font-semibold text-foreground">{totalPages}</span>
           </span>
 
           <button
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="p-1 rounded hover:bg-muted disabled:opacity-50 transition-colors"
+            className="p-2 rounded-lg hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             aria-label="Next page"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>

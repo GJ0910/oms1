@@ -173,23 +173,23 @@
   
   /* Status badges */
   .badge-success {
-    @apply inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400;
+    @apply inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800 shadow-sm dark:bg-green-900/30 dark:text-green-400;
   }
   
   .badge-warning {
-    @apply inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400;
+    @apply inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 shadow-sm dark:bg-amber-900/30 dark:text-amber-400;
   }
   
   .badge-pending {
-    @apply inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+    @apply inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800 shadow-sm dark:bg-blue-900/30 dark:text-blue-400;
   }
   
   .badge-error {
-    @apply inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400;
+    @apply inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800 shadow-sm dark:bg-red-900/30 dark:text-red-400;
   }
   
   .badge-default {
-    @apply inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300;
+    @apply inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-800 shadow-sm dark:bg-gray-700 dark:text-gray-300;
   }
   
   /* Field styles */
@@ -251,5 +251,14 @@
   
   .timeline-description {
     @apply text-sm text-foreground mt-1;
+  }
+  
+  /* Date input styles */
+  .date-input {
+    @apply px-2.5 py-1.5 rounded-sm border border-border/60 bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-muted-foreground/50;
+  }
+  
+  .date-range-container {
+    @apply flex items-center gap-2.5 px-3 py-2 rounded-md border border-border bg-card;
   }
 }

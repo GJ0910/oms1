@@ -62,24 +62,38 @@ export function OrderFinancialsCard({
   ];
 
   return (
-    <div className="card-section">
-      <h2 className="card-title">Order Financials & Logistics</h2>
+    <div className="rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-foreground mb-5">Order Financials & Logistics</h2>
 
       {/* Logistics info */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 pb-8 border-b border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-border/50">
         {/* AWB */}
         <div>
-          <div className="field-label">AWB</div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">AWB</div>
           <div className="flex items-center gap-2 mt-1">
-            <div className="field-value font-mono m-0">{awb}</div>
+            <div className="text-sm font-mono text-foreground">{awb}</div>
             <CopyButton text={awb} label="Copy" />
           </div>
         </div>
 
         {/* Courier Partner */}
         <div>
-          <div className="field-label">Courier Partner</div>
-          <div className="field-value">{courierPartner}</div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Courier Partner</div>
+          <div className="text-sm text-foreground">{courierPartner}</div>
+        </div>
+
+        {/* Coupon Code Used */}
+        {couponCodeUsed && (
+          <div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Coupon Code Used</div>
+            <div className="text-sm text-foreground font-mono">{couponCodeUsed}</div>
+          </div>
+        )}
+
+        {/* Invoice Summary */}
+        <div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Invoice Summary</div>
+          <div className="text-sm font-mono text-foreground font-medium">{formatINR(invoiceSummaryINR)}</div>
         </div>
 
         {/* Coupon Code Used */}

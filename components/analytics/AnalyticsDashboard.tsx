@@ -267,7 +267,10 @@ export function AnalyticsDashboard() {
     to: new Date("2026-03-17"),
   })
 
-  const [chartDraftRange, setChartDraftRange] = useState<{ from: Date; to: Date } | null>(null)
+  const [chartDraftRange, setChartDraftRange] = useState<{ from: Date; to: Date }>({
+    from: new Date("2026-02-15"),
+    to: new Date("2026-03-17"),
+  })
   const [chartPopoverOpen, setChartPopoverOpen] = useState(false)
 
   // Dashboard range state (applied + draft)
@@ -276,7 +279,10 @@ export function AnalyticsDashboard() {
     to: new Date("2026-03-17"),
   })
 
-  const [dashboardDraftRange, setDashboardDraftRange] = useState<{ from: Date; to: Date } | null>(null)
+  const [dashboardDraftRange, setDashboardDraftRange] = useState<{ from: Date; to: Date }>({
+    from: new Date("2026-02-15"),
+    to: new Date("2026-03-17"),
+  })
   const [dashboardPopoverOpen, setDashboardPopoverOpen] = useState(false)
 
   const formatRangeLabel = (from: Date, to: Date) => {
@@ -295,8 +301,6 @@ export function AnalyticsDashboard() {
       )
     })
   }, [MOCK_ORDERS, dashboardAppliedRange])
-
-  console.log("dashboardAppliedRange", dashboardAppliedRange, filteredOrdersForMetrics.length)
 
   // Metric values derived from filtered orders
   const metricValues = useMemo(() => {
@@ -422,8 +426,6 @@ export function AnalyticsDashboard() {
     })
   }, [activeTab, chartAppliedRange])
 
-  console.log("chartAppliedRange", chartAppliedRange, filteredChartData.length)
-
   // Get chart config and title
   const { chartConfig, chartTitle, metricOptions } = useMemo(() => {
     switch (activeTab) {
@@ -535,43 +537,49 @@ export function AnalyticsDashboard() {
           }}
         >
           <PopoverTrigger asChild>
-            <button className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/50">
-              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-              <span>{formatRangeLabel(dashboardAppliedRange.from, dashboardAppliedRange.to)}</span>
+            <button className="flex items-center gap-2.5 rounded-md border border-border bg-card px-3.5 py-2 text-sm font-medium text-foreground hover:bg-muted/60 hover:border-border/80 transition-all duration-200 active:scale-95">
+              <CalendarIcon className="h-4 w-4 text-primary/70" />
+              <span className="text-foreground font-medium">{formatRangeLabel(dashboardAppliedRange.from, dashboardAppliedRange.to)}</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-[320px]" align="end" side="bottom">
-            <DateRangeCalendar
-              mode="range"
-              numberOfMonths={2}
-              disabled={{ after: new Date() }}
-              selected={dashboardDraftRange}
-              onSelect={(range) => setDashboardDraftRange(range ?? dashboardDraftRange)}
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setDashboardDraftRange(dashboardAppliedRange);
-                  setDashboardPopoverOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => {
-                  if (dashboardDraftRange.from && dashboardDraftRange.to) {
-                    setDashboardAppliedRange(dashboardDraftRange);
-                  }
-                  setDashboardPopoverOpen(false);
-                }}
-              >
-                Apply
-              </Button>
-            </div>
-          </PopoverContent>
+            <PopoverContent className="w-auto" align="end" side="bottom">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-semibold text-foreground">Select Date Range</h3>
+                  <p className="text-xs text-muted-foreground">Choose start and end dates for dashboard metrics</p>
+                </div>
+                <DateRangeCalendar
+                  mode="range"
+                  numberOfMonths={2}
+                  disabled={{ after: new Date() }}
+                  selected={dashboardDraftRange}
+                  onSelect={(range) => setDashboardDraftRange(range ?? dashboardDraftRange)}
+                />
+                <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setDashboardDraftRange(dashboardAppliedRange);
+                      setDashboardPopoverOpen(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      if (dashboardDraftRange.from && dashboardDraftRange.to) {
+                        setDashboardAppliedRange(dashboardDraftRange);
+                      }
+                      setDashboardPopoverOpen(false);
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
         </Popover>
       </div>
 
@@ -596,41 +604,47 @@ export function AnalyticsDashboard() {
                     }}
                   >
                     <PopoverTrigger asChild>
-                      <button className="flex items-center gap-2 px-2 py-1 rounded border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground/60" />
-                        <span className="text-xs">{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
+                      <button className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-background text-foreground text-sm font-medium hover:bg-muted/60 hover:border-border/80 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <CalendarIcon className="h-4 w-4 text-primary/60" />
+                        <span>{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[320px]" side="top">
-                      <DateRangeCalendar
-                        mode="range"
-                        numberOfMonths={2}
-                        disabled={{ after: new Date() }}
-                        selected={chartDraftRange}
-                        onSelect={(range) => setChartDraftRange(range ?? chartDraftRange)}
-                      />
-                      <div className="mt-4 flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setChartDraftRange(chartAppliedRange);
-                            setChartPopoverOpen(false);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            if (chartDraftRange.from && chartDraftRange.to) {
-                              setChartAppliedRange(chartDraftRange);
-                            }
-                            setChartPopoverOpen(false);
-                          }}
-                        >
-                          Apply
-                        </Button>
+                    <PopoverContent className="w-auto" side="top">
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <h3 className="text-sm font-semibold text-foreground">Chart Date Range</h3>
+                          <p className="text-xs text-muted-foreground">Adjust the date range for this chart</p>
+                        </div>
+                        <DateRangeCalendar
+                          mode="range"
+                          numberOfMonths={2}
+                          disabled={{ after: new Date() }}
+                          selected={chartDraftRange}
+                          onSelect={(range) => setChartDraftRange(range ?? chartDraftRange)}
+                        />
+                        <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setChartDraftRange(chartAppliedRange);
+                              setChartPopoverOpen(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (chartDraftRange.from && chartDraftRange.to) {
+                                setChartAppliedRange(chartDraftRange);
+                              }
+                              setChartPopoverOpen(false);
+                            }}
+                          >
+                            Apply
+                          </Button>
+                        </div>
                       </div>
                     </PopoverContent>
                   </Popover>
@@ -793,41 +807,47 @@ export function AnalyticsDashboard() {
                     }}
                   >
                     <PopoverTrigger asChild>
-                      <button className="flex items-center gap-2 px-2 py-1 rounded border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground/60" />
-                        <span className="text-xs">{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
+                      <button className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-background text-foreground text-sm font-medium hover:bg-muted/60 hover:border-border/80 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <CalendarIcon className="h-4 w-4 text-primary/60" />
+                        <span>{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[320px]" side="top">
-                      <DateRangeCalendar
-                        mode="range"
-                        numberOfMonths={2}
-                        disabled={{ after: new Date() }}
-                        selected={chartDraftRange}
-                        onSelect={(range) => setChartDraftRange(range ?? chartDraftRange)}
-                      />
-                      <div className="mt-4 flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setChartDraftRange(chartAppliedRange);
-                            setChartPopoverOpen(false);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            if (chartDraftRange.from && chartDraftRange.to) {
-                              setChartAppliedRange(chartDraftRange);
-                            }
-                            setChartPopoverOpen(false);
-                          }}
-                        >
-                          Apply
-                        </Button>
+                    <PopoverContent className="w-auto" side="top">
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <h3 className="text-sm font-semibold text-foreground">Chart Date Range</h3>
+                          <p className="text-xs text-muted-foreground">Adjust the date range for this chart</p>
+                        </div>
+                        <DateRangeCalendar
+                          mode="range"
+                          numberOfMonths={2}
+                          disabled={{ after: new Date() }}
+                          selected={chartDraftRange}
+                          onSelect={(range) => setChartDraftRange(range ?? chartDraftRange)}
+                        />
+                        <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setChartDraftRange(chartAppliedRange);
+                              setChartPopoverOpen(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (chartDraftRange.from && chartDraftRange.to) {
+                                setChartAppliedRange(chartDraftRange);
+                              }
+                              setChartPopoverOpen(false);
+                            }}
+                          >
+                            Apply
+                          </Button>
+                        </div>
                       </div>
                     </PopoverContent>
                   </Popover>
@@ -966,41 +986,47 @@ export function AnalyticsDashboard() {
                     }}
                   >
                     <PopoverTrigger asChild>
-                      <button className="flex items-center gap-2 px-2 py-1 rounded border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground/60" />
-                        <span className="text-xs">{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
+                      <button className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-background text-foreground text-sm font-medium hover:bg-muted/60 hover:border-border/80 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <CalendarIcon className="h-4 w-4 text-primary/60" />
+                        <span>{formatRangeLabel(chartAppliedRange.from, chartAppliedRange.to)}</span>
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[320px]" side="top">
-                      <DateRangeCalendar
-                        mode="range"
-                        numberOfMonths={2}
-                        disabled={{ after: new Date() }}
-                        selected={chartDraftRange}
-                        onSelect={(range) => setChartDraftRange(range ?? chartDraftRange)}
-                      />
-                      <div className="mt-4 flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setChartDraftRange(chartAppliedRange);
-                            setChartPopoverOpen(false);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            if (chartDraftRange.from && chartDraftRange.to) {
-                              setChartAppliedRange(chartDraftRange);
-                            }
-                            setChartPopoverOpen(false);
-                          }}
-                        >
-                          Apply
-                        </Button>
+                    <PopoverContent className="w-auto" side="top">
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <h3 className="text-sm font-semibold text-foreground">Chart Date Range</h3>
+                          <p className="text-xs text-muted-foreground">Adjust the date range for this chart</p>
+                        </div>
+                        <DateRangeCalendar
+                          mode="range"
+                          numberOfMonths={2}
+                          disabled={{ after: new Date() }}
+                          selected={chartDraftRange}
+                          onSelect={(range) => setChartDraftRange(range ?? chartDraftRange)}
+                        />
+                        <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setChartDraftRange(chartAppliedRange);
+                              setChartPopoverOpen(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (chartDraftRange.from && chartDraftRange.to) {
+                                setChartAppliedRange(chartDraftRange);
+                              }
+                              setChartPopoverOpen(false);
+                            }}
+                          >
+                            Apply
+                          </Button>
+                        </div>
                       </div>
                     </PopoverContent>
                   </Popover>
